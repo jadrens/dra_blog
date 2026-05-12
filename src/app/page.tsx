@@ -1,0 +1,28 @@
+import Navbar from "@/components/layout/Navbar";
+import { Box, Avatar } from "@mui/material";
+import StylizedName from "@/components/home/StylizedName";
+
+export default function Home() {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-1 flex items-center justify-center">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 4,
+          }}
+        >
+          <Avatar
+            src="/avatar.png"
+            alt="Jadren Rayne"
+            sx={{ width: 120, height: 120 }}
+          />
+          <StylizedName />
+        </Box>
+      </main>
+    </div>
+  );
+}

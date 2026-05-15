@@ -3,7 +3,7 @@ import { getPosts, getAllViews } from "./actions";
 import BlogContent from "./BlogContent";
 
 export const metadata = {
-  title: "Posts - My Blog",
+  title: "Posts - dragonren-blog",
   description: "All blog posts",
 };
 

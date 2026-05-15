@@ -23,7 +23,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "My Blog",
+  title: "dragonren-blog",
   description: "A blog with markdown and LaTeX support",
 };
 

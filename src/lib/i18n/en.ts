@@ -8,6 +8,7 @@ export const en = {
   blog: {
     views: "views",
     backToPosts: "Posts",
+    characters: "chars",
   },
   theme: {
     toggle: "Toggle theme",

@@ -9,6 +9,7 @@ export interface Post {
   title: string;
   date: string;
   content: string;
+  tags: string[];
 }
 
 export function getPostSlugs(): string[] {
@@ -29,6 +30,7 @@ export function getPostBySlug(slug: string): Post {
     title: data.title || "Untitled",
     date: data.date ? new Date(data.date).toISOString().split('T')[0] : "",
     content,
+    tags: data.tags || [],
   };
 }
 

@@ -23,6 +23,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ThemeToggle from "../navigation/ThemeToggle";
 import LocaleSwitcher from "../navigation/LocaleSwitcher";
 import { useI18n } from "@/lib/i18n";
+import { alpha } from "@mui/material";
 
 export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -30,15 +31,22 @@ export default function Navbar() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { t } = useI18n();
 
+
   return (
     <>
       <AppBar
         position="static"
         color="default"
         elevation={0}
-        sx={{ borderBottom: 1, borderColor: "divider" }}
+        sx={{
+          borderBottom: 1,
+          borderColor: "divider",
+          backdropFilter: "blur(2px)",
+          WebkitBackdropFilter: "blur(2px)",
+          backgroundColor: alpha(theme.palette.background.default, 0.5),
+        }}
       >
-        <Toolbar>
+        <Toolbar sx={{ px: { xs: 2, sm: 4 } }}>
           <Box sx={{ flexGrow: 1 }}>
             <Avatar
               component={Link}
@@ -83,7 +91,7 @@ export default function Navbar() {
         anchor="right"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        sx={{ "& .MuiDrawer-paper": { width: 280 } }}
+        sx={{ "& .MuiDrawer-paper": { width: 280, px: 2 } }}
       >
         <Box
           sx={{

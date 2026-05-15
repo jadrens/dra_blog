@@ -15,7 +15,7 @@ export default function Footer() {
       sx={{
         mt: "auto",
         py: 3,
-        px: 3,
+        px: { xs: 4, sm: 3 },
         borderTop: 1,
         borderColor: "divider",
         bgcolor: "background.paper",

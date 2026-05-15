@@ -10,6 +10,7 @@ export const zhCN: TranslationKeys = {
   blog: {
     views: "浏览",
     backToPosts: "文章",
+    characters: "字数",
   },
   theme: {
     toggle: "切换主题",

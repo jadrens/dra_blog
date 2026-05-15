@@ -1,12 +1,14 @@
 import Navbar from "@/components/layout/Navbar";
 import { Box, Avatar } from "@mui/material";
 import StylizedName from "@/components/home/StylizedName";
+import ConfettiBackground from "@/components/home/ConfettiBackground";
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
+      <ConfettiBackground />
       <Navbar />
-      <main className="flex-1 flex items-center justify-center">
+      <main className="flex-1 flex items-center justify-center relative z-10">
         <Box
           sx={{
             display: "flex",

@@ -9,22 +9,59 @@ const lightTheme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#1976d2",
-      light: "#64b5f6",
-      dark: "#1565c0",
+      main: "#89a0d2",
+      light: "#a8b5c9",
+      dark: "#7081a6",
+    },
+    secondary: {
+      main: "#c9a87c",
+      light: "#d4bc94",
+      dark: "#b08f5f",
     },
     background: {
-      default: "#ffffff",
-      paper: "#faf8f5",
+      default: "#f8f6f3",
+      paper: "#fdfcfb",
     },
     text: {
-      secondary: "#202020",
+      primary: "#3d3d3d",
+      secondary: "#474747",
+    },
+    divider: "#e8e4df",
+    action: {
+      hover: "#f0ede8",
+      selected: "#e8e4df",
     },
   },
   typography: {
-    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+    fontFamily: "'Nunito', system-ui, -apple-system, sans-serif",
     allVariants: {
-      fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+      fontFamily: "'Nunito', system-ui, -apple-system, sans-serif",
+    },
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          scrollbarWidth: "thin",
+          scrollbarColor: "transparent transparent",
+          "&::-webkit-scrollbar": {
+            width: "6px",
+            height: "6px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "#c9a87c",
+            borderRadius: "3px",
+            opacity: 0,
+            transition: "opacity 0.3s ease",
+          },
+          "&:hover::-webkit-scrollbar-thumb": {
+            opacity: 1,
+          },
+        },
+      },
     },
   },
 });
@@ -33,22 +70,59 @@ const darkTheme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-      main: "#90caf9",
-      light: "#e3f2fd",
-      dark: "#42a5f5",
+      main: "#9db4d4",
+      light: "#b8c5db",
+      dark: "#7a92b8",
+    },
+    secondary: {
+      main: "#c9a87c",
+      light: "#d4bc94",
+      dark: "#b08f5f",
     },
     background: {
-      default: "#121212",
-      paper: "#1e1e1e",
+      default: "#1e1e1e",
+      paper: "#2a2a2a",
     },
     text: {
-      secondary: "#d4d3d3",
+      primary: "#e8e4df",
+      secondary: "#d3d3d3",
+    },
+    divider: "#3a3a3a",
+    action: {
+      hover: "#2f2f2f",
+      selected: "#3a3a3a",
     },
   },
   typography: {
-    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+    fontFamily: "'Nunito', system-ui, -apple-system, sans-serif",
     allVariants: {
-      fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+      fontFamily: "'Nunito', system-ui, -apple-system, sans-serif",
+    },
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          scrollbarWidth: "thin",
+          scrollbarColor: "transparent transparent",
+          "&::-webkit-scrollbar": {
+            width: "6px",
+            height: "6px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "#c9a87c",
+            borderRadius: "3px",
+            opacity: 0,
+            transition: "opacity 0.3s ease",
+          },
+          "&:hover::-webkit-scrollbar-thumb": {
+            opacity: 1,
+          },
+        },
+      },
     },
   },
 });

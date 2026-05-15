@@ -53,9 +53,9 @@ function HeadingWithAnchor({
         component="span"
         sx={{
           position: "absolute",
-          left: -20,
+          left: { xs: -8, sm: -10 },
           top: 20,
-          fontSize: "0.6em",
+          fontSize: "0.5em",
           color: "text.disabled",
           fontWeight: 500,
           userSelect: "none",
@@ -77,13 +77,13 @@ function HeadingWithAnchor({
           gap: 0.5,
           px: 1,
           py: 0.25,
-          // bgcolor: "action.hover",
           borderRadius: 1,
           cursor: "pointer",
           fontWeight: "inherit",
           fontSize: "inherit",
           lineHeight: "inherit",
-          "&:hover": { bgcolor: "action.selected" },
+          "&:hover": { bgcolor: "action.selected", transform: "translateX(2px)" },
+          transition: "all 0.2s ease",
           ...sx,
         }}
       >
@@ -178,15 +178,24 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
     <Box
       ref={contentRef}
       sx={{
-        "& h1": { mt: 4, mb: 2, mx: 2, fontWeight: "bold", fontSize: "2rem" },
-        "& h2": { mt: 4, mb: 2, mx: 2, fontWeight: "bold", fontSize: "1.5rem" },
-        "& h3": { mt: 3, mb: 1, mx: 2, fontWeight: "bold", fontSize: "1.25rem"},
-        "& p": { mb: 2, mx: 2, lineHeight: 1.7, color: "text.secondary" },
-        "& ul, & ol": { mb: 2, pl: 4, mx: 2 },
+        "& h1": {
+          mt: 4, mb: 2, mx: { xs: 3, sm: 2 }, fontWeight: "bold", fontSize: "2rem",
+          transition: 'all 0.3s ease',
+        },
+        "& h2": {
+          mt: 4, mb: 2, mx: { xs: 3, sm: 2 }, fontWeight: "bold", fontSize: "1.5rem",
+          transition: 'all 0.3s ease',
+        },
+        "& h3": {
+          mt: 3, mb: 1, mx: { xs: 3, sm: 2 }, fontWeight: "bold", fontSize: "1.25rem",
+          transition: 'all 0.3s ease',
+        },
+        "& p": { mb: 2, mx: { xs: 3, sm: 2 }, lineHeight: 1.7, color: "text.secondary" },
+        "& ul, & ol": { mb: 2, pl: 4, mx: { xs: 3, sm: 2 } },
         "& li": { mb: 0.5 },
         "& blockquote": {
           mb: 2,
-          mx: 2,
+          mx: { xs: 3, sm: 2 },
           pl: 2,
           borderLeft: "4px solid",
           borderColor: "divider",
@@ -199,7 +208,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
           fontFamily: "'JetBrains Mono', Consolas, monospace",
           fontSize: "0.9em",
         },
-        "& table": { mb: 2, mx: 2, width: "calc(100% - 32px)", borderCollapse: "collapse" },
+        "& table": { mb: 2, mx: { xs: 3, sm: 2 }, width: "calc(100% - 48px)", borderCollapse: "collapse" },
         "& th, & td": { border: 1, borderColor: "divider", p: 1 },
         "& th": { fontWeight: "bold" },
       }}

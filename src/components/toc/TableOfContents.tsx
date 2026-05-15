@@ -177,7 +177,7 @@ export default function TableOfContents() {
         flexShrink: 0,
         position: "sticky",
         top: navVisible ? 64 : 0,
-        maxHeight: navVisible ? "calc(100vh - 100px)" : "calc(100vh - 32px)",
+        maxHeight: navVisible ? "calc(100vh - 64px)" : "calc(100vh)",
         overflowY: "auto",
         pl: 2,
         pr: 2,

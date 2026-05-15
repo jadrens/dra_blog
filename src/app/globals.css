@@ -1,11 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=MiSans:wght@400;500;600;700&display=swap');
+@import "./misans.css";
 
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8f6f3;
+  --foreground: #4a4a4a;
 }
 
 @theme inline {
@@ -15,26 +15,46 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1e1e1e;
+    --foreground: #e8e4df;
   }
 }
 
 [data-theme="dark"] {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #1e1e1e;
+  --foreground: #e8e4df;
 }
 
-* {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'MiSans', var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter), 'MiSans', var(--font-nunito), system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+  color: #8b9dc3;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #c9a87c;
 }
 
 code, pre {
   font-family: var(--font-jetbrains-mono), 'JetBrains Mono', Consolas, monospace;
+}
+
+text{
+  z-index: 3;
+}
+
+::selection {
+  background: #c9a87c;
+  color: #fdfcfb;
 }

@@ -3,6 +3,7 @@
 import { Box, Typography, Chip, Avatar } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import LinkIcon from "@mui/icons-material/Link";
+import GitHubIcon from "@mui/icons-material/GitHub";
 import { useI18n } from "@/lib/i18n";
 
 export default function Footer() {
@@ -53,6 +54,18 @@ export default function Footer() {
             label={t.footer.beian}
             component="a"
             href="https://beian.miit.gov.cn/"
+            clickable
+            size="small"
+            variant="outlined"
+            target="_blank"
+            rel="noopener"
+            sx={{ p: 1.5 }}
+          />
+          <Chip
+            icon={<GitHubIcon sx={{ fontSize: 14 }} />}
+            label="GitHub"
+            component="a"
+            href="https://github.com/jadrens/drablog"
             clickable
             size="small"
             variant="outlined"

@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My Blog
 
-## Getting Started
+Live: **https://blog.dragonren.top**
 
-First, run the development server:
+A personal blog built with Next.js, featuring markdown and LaTeX support.
+
+## Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install && pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+See [docs/getting-started.md](docs/getting-started.md) for full guide.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Contributing
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Contributions are welcome! You can contribute in two ways:
 
-## Learn More
+### 1. Blog Posts
 
-To learn more about Next.js, take a look at the following resources:
+Edit or add markdown files in `content/posts/`. The frontmatter format:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```markdown
+---
+title: Your Post Title
+date: 2026-05-15
+lang: en
+---
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 2. Code
 
-## Deploy on Vercel
+Open a pull request on [GitHub](https://github.com/jadrens/drablog) or [Gitee](https://gitee.com/dragonrenpro/drag_blog).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Push to `run` branch, then run:
+
+```bash
+./scripts/deploy.sh
+```

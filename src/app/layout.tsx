@@ -25,6 +25,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "dragonren-blog",
   description: "A blog with markdown and LaTeX support",
+  other: {
+    "google-site-verification": "ACpqVvUPYrrYYHEZh7Ew7z7TsxTntlmql8n7b97V164",
+  },
 };
 
 export default function RootLayout({

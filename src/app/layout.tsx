@@ -26,9 +26,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: SITE_CONFIG.siteName,
   description: SITE_CONFIG.description,
-  other: {
-    "google-site-verification": "ACpqVvUPYrrYYHEZh7Ew7z7TsxTntlmql8n7b97V164",
-  },
+  other: {},
 };
 
 export default function RootLayout({

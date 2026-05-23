@@ -159,11 +159,12 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
       headings.push({ id, text, level });
     }
 
-    const result: { id: string; text: string; level: 1 | 2 | 3; children: typeof result }[] = [];
+    type HeadingNode = { id: string; text: string; level: 1 | 2 | 3; children: HeadingNode[] };
+    const result: HeadingNode[] = [];
     const parentStack = [{ level: 0, children: result }];
 
     headings.forEach((h) => {
-      const node = { ...h, children: [] as typeof result };
+      const node: HeadingNode = { ...h, children: [] };
       while (parentStack.length > 1 && parentStack[parentStack.length - 1].level >= h.level) {
         parentStack.pop();
       }

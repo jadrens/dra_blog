@@ -49,3 +49,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 scripts/deploy.sh
+
+
+
+#pnpm files
+pnpm-lock.yaml
+pnpm-workspace.yaml

@@ -9,6 +9,7 @@ import ThemeRegistry from "@/components/layout/ThemeRegistry/ThemeRegistry";
 import { I18nProvider } from "@/lib/i18n";
 import LoadingBar from "@/components/layout/LoadingBar";
 import Footer from "@/components/layout/Footer";
+import { SITE_CONFIG } from "@/lib/config";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -23,8 +24,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "dragonren-blog",
-  description: "A blog with markdown and LaTeX support",
+  title: SITE_CONFIG.siteName,
+  description: SITE_CONFIG.description,
   other: {
     "google-site-verification": "ACpqVvUPYrrYYHEZh7Ew7z7TsxTntlmql8n7b97V164",
   },

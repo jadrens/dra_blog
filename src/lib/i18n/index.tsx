@@ -2,13 +2,20 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { en, TranslationKeys } from "./en";
-import { zhCN } from "./zh-CN";
+import { zh } from "./zh";
 
-export type Locale = "en" | "zh-CN";
+export type Locale = "en" | "zh";
+
+export const SUPPORTED_LOCALES: Locale[] = ["en", "zh"];
+
+function normalizeLocale(lang: string): Locale {
+  if (lang.startsWith("zh")) return "zh";
+  return "en";
+}
 
 const translations: Record<Locale, TranslationKeys> = {
   en,
-  "zh-CN": zhCN,
+  zh,
 };
 
 interface I18nContextType {
@@ -38,9 +45,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       setLocale(stored);
     } else {
       const browserLang = navigator.language;
-      if (browserLang.startsWith("zh")) {
-        setLocale("zh-CN");
-      }
+      setLocale(normalizeLocale(browserLang));
     }
   }, []);
 

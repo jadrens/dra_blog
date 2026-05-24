@@ -1,8 +1,13 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { getSearchIndex, PostMeta } from "./search-index";
 
-const postsDirectory = path.join(process.cwd(), "content/posts");
+export type Locale = "en" | "zh";
+
+function getPostsDirectory(locale: Locale): string {
+  return path.join(process.cwd(), `content/posts/${locale}`);
+}
 
 export interface Post {
   slug: string;
@@ -12,31 +17,43 @@ export interface Post {
   tags: string[];
 }
 
-export function getPostSlugs(): string[] {
-  if (!fs.existsSync(postsDirectory)) return [];
-  return fs
-    .readdirSync(postsDirectory)
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => file.replace(".md", ""));
+export function getPostSlugs(locale: Locale): string[] {
+  const index = getSearchIndex(locale);
+  return index.postsByDate.map((p) => p.slug);
 }
 
-export function getPostBySlug(slug: string): Post {
+export function getPostBySlug(slug: string, locale: Locale): Post {
+  const meta = getSearchIndex(locale).postsByDate.find((p) => p.slug === slug);
+  if (!meta) {
+    return { slug, title: "Not Found", date: "", content: "", tags: [] };
+  }
+
+  const postsDirectory = getPostsDirectory(locale);
   const fullPath = path.join(postsDirectory, `${slug}.md`);
   const fileContents = fs.readFileSync(fullPath, "utf8");
-  const { data, content } = matter(fileContents);
+  const { content } = matter(fileContents);
 
   return {
-    slug,
-    title: data.title || "Untitled",
-    date: data.date ? new Date(data.date).toISOString().split('T')[0] : "",
+    slug: meta.slug,
+    title: meta.title,
+    date: meta.date,
     content,
-    tags: data.tags || [],
+    tags: meta.tags,
   };
 }
 
-export function getAllPosts(): Post[] {
-  const slugs = getPostSlugs();
-  return slugs
-    .map((slug) => getPostBySlug(slug))
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
+export function getAllPosts(locale: Locale): Post[] {
+  const index = getSearchIndex(locale);
+  return index.postsByDate.map((meta: PostMeta) => {
+    const fullPath = path.join(getPostsDirectory(locale), `${meta.slug}.md`);
+    const fileContents = fs.readFileSync(fullPath, "utf8");
+    const { content } = matter(fileContents);
+    return {
+      slug: meta.slug,
+      title: meta.title,
+      date: meta.date,
+      content,
+      tags: meta.tags,
+    };
+  });
 }

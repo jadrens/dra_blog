@@ -5,9 +5,11 @@ import ConfettiBackground from "@/components/home/ConfettiBackground";
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div>
       <ConfettiBackground />
       <Navbar />
+        <div className="min-h-screen flex flex-col">
+      
       <main className="flex-1 flex items-center justify-center relative z-10">
         <Box
           sx={{
@@ -26,5 +28,7 @@ export default function Home() {
         </Box>
       </main>
     </div>
+    </div>
+  
   );
 }

@@ -83,7 +83,7 @@ export default function ConfettiBackground() {
 
     const width = canvas.width;
     const height = canvas.height;
-    const wallThickness = 100;
+    const wallThickness = 150;
 
     const walls = [
       Bodies.rectangle(width / 2, -wallThickness / 2, width, wallThickness, { isStatic: true, restitution: 0.8 }),

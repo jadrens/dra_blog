@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "generatedAt": "2026-05-24T14:32:37.289Z",
+  "postsByDate": [
+    {
+      "slug": "1",
+      "title": "Submitting Code to Arch Linux Official Repositories",
+      "date": "2026-05-15",
+      "tags": [
+        "Arch Linux",
+        "Open Source",
+        "Linux Kernel",
+        "Shell"
+      ],
+      "locale": "en"
+    },
+    {
+      "slug": "about-blog",
+      "title": "About This Blog",
+      "date": "2026-05-14",
+      "tags": [],
+      "locale": "en"
+    }
+  ],
+  "postsByTag": {
+    "Arch Linux": [
+      {
+        "slug": "1",
+        "title": "Submitting Code to Arch Linux Official Repositories",
+        "date": "2026-05-15",
+        "tags": [
+          "Arch Linux",
+          "Open Source",
+          "Linux Kernel",
+          "Shell"
+        ],
+        "locale": "en"
+      }
+    ],
+    "Open Source": [
+      {
+        "slug": "1",
+        "title": "Submitting Code to Arch Linux Official Repositories",
+        "date": "2026-05-15",
+        "tags": [
+          "Arch Linux",
+          "Open Source",
+          "Linux Kernel",
+          "Shell"
+        ],
+        "locale": "en"
+      }
+    ],
+    "Linux Kernel": [
+      {
+        "slug": "1",
+        "title": "Submitting Code to Arch Linux Official Repositories",
+        "date": "2026-05-15",
+        "tags": [
+          "Arch Linux",
+          "Open Source",
+          "Linux Kernel",
+          "Shell"
+        ],
+        "locale": "en"
+      }
+    ],
+    "Shell": [
+      {
+        "slug": "1",
+        "title": "Submitting Code to Arch Linux Official Repositories",
+        "date": "2026-05-15",
+        "tags": [
+          "Arch Linux",
+          "Open Source",
+          "Linux Kernel",
+          "Shell"
+        ],
+        "locale": "en"
+      }
+    ]
+  }
+}

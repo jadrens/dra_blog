@@ -139,7 +139,7 @@ export default function Navbar() {
           />
 
           {isMobile ? (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", flexDirection: "row-reverse", flexGrow: 1, gap: 1 }}>
               <IconButton onClick={() => setSearchFocused(true)} aria-label="Search">
                 <SearchIcon />
               </IconButton>

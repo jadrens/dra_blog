@@ -50,6 +50,11 @@ yarn-error.log*
 next-env.d.ts
 scripts/deploy.sh
 
+# claude
+CLAUDE.md
+AGENTS.md
+.claude/
+
 
 
 #pnpm files

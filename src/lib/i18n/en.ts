@@ -34,6 +34,10 @@ export const en = {
     description: "This is my blog.",
     email: "jaden@jadren.moe",
     github: "jadrens",
+    youtube: "dragonren",
+    bilibili: "dragonren",
+    telegram: "dragonren",
+    socials: "Socials",
   },
   home: {
     title: "dragonren",
@@ -77,6 +81,10 @@ export const en = {
     500: "Internal Server Error",
     backHome: "Back to home",
     retry: "Retry",
+  },
+  codeBlock: {
+    copy: "Copy",
+    copied: "Copied!",
   },
 };
 

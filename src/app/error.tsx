@@ -103,7 +103,6 @@ export default function Error({
           )}
         </Box>
       </Box>
-      <Footer />
     </div>
   );
 }

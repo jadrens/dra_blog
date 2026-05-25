@@ -36,6 +36,10 @@ export const zh: TranslationKeys = {
     description: "这是我的博客。",
     email: "jaden@jadren.moe",
     github: "jadrens",
+    youtube: "dragonren",
+    bilibili: "dragonren",
+    telegram: "dragonren",
+    socials: "社交媒体",
   },
   home: {
     title: "dragonren",
@@ -79,5 +83,9 @@ export const zh: TranslationKeys = {
     500: "服务器出了点问题",
     backHome: "返回首页",
     retry: "重试",
+  },
+  codeBlock: {
+    copy: "复制",
+    copied: "已复制！",
   },
 };

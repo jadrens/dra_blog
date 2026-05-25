@@ -1,6 +1,6 @@
 "use client";
 
-import { IconButton } from "@mui/material";
+import { IconButton, Box } from "@mui/material";
 import WbSunnyIcon from "@mui/icons-material/WbSunny";
 import NightsStayIcon from "@mui/icons-material/NightsStay";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,9 +13,11 @@ export default function ThemeToggle() {
     <IconButton
       onClick={toggleTheme}
       sx={{
-        transition: "transform 0.3s ease-in-out, rotate 0.3s ease-in-out",
+        position: "relative",
+        width: 40,
+        height: 40,
+        overflow: "hidden",
         "&:hover": {
-          transform: "rotate(15deg) scale(1.1)",
           backgroundColor: "action.hover",
         },
       }}
@@ -25,22 +27,40 @@ export default function ThemeToggle() {
         {theme === "dark" ? (
           <motion.div
             key="sun"
-            initial={{ rotate: -90, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            exit={{ rotate: 90, opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            initial={{ scale: 0, rotate: -180, opacity: 0 }}
+            animate={{ scale: 1, rotate: 0, opacity: 1 }}
+            exit={{ scale: 0, rotate: 180, opacity: 0 }}
+            transition={{
+              duration: 0.4,
+              ease: [0.4, 0, 0.2, 1],
+            }}
+            style={{
+              position: "absolute",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <WbSunnyIcon sx={{ color: "#fbbf24" }} />
+            <WbSunnyIcon sx={{ color: "#fbbf24", fontSize: 22 }} />
           </motion.div>
         ) : (
           <motion.div
             key="moon"
-            initial={{ rotate: 90, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            exit={{ rotate: -90, opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            initial={{ scale: 0, rotate: 180, opacity: 0 }}
+            animate={{ scale: 1, rotate: 0, opacity: 1 }}
+            exit={{ scale: 0, rotate: -180, opacity: 0 }}
+            transition={{
+              duration: 0.4,
+              ease: [0.4, 0, 0.2, 1],
+            }}
+            style={{
+              position: "absolute",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <NightsStayIcon sx={{ color: "#6366f1" }} />
+            <NightsStayIcon sx={{ color: "#6366f1", fontSize: 22 }} />
           </motion.div>
         )}
       </AnimatePresence>

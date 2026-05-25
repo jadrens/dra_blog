@@ -2,14 +2,17 @@
 
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
+import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
 import { Box, Paper } from "@mui/material";
 import CodeBlock from "./CodeBlock";
 import { useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import TagIcon from "@mui/icons-material/Tag";
 import { useReadingProgress, slugify } from "../reading/ReadingProgressContext";
+import React from "react";
 
 interface MarkdownContentProps {
   content: string;
@@ -61,7 +64,6 @@ function HeadingWithAnchor({
           userSelect: "none",
           opacity: 0.6,
           zIndex: 3,
-          // backgroundColor: "#88888833",
           padding: "4px",
         }}
       >
@@ -82,6 +84,7 @@ function HeadingWithAnchor({
           fontWeight: "inherit",
           fontSize: "inherit",
           lineHeight: "inherit",
+          bgcolor: "background.default",
           "&:hover": { bgcolor: "action.selected", transform: "translateX(2px)" },
           transition: "all 0.2s ease",
           ...sx,
@@ -215,10 +218,19 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
       }}
     >
       <ReactMarkdown
-        remarkPlugins={[remarkMath]}
-        rehypePlugins={[rehypeKatex, rehypeHighlight]}
+        remarkPlugins={[remarkMath, remarkGfm]}
+        rehypePlugins={[rehypeKatex, rehypeHighlight, rehypeRaw]}
         components={{
-          pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
+          pre: ({ children}) => {
+            let className = '';
+  
+            React.Children.forEach(children, (child) => {
+              if (React.isValidElement(child) && child.type === 'code') {
+                className = (child.props as any).className || '';
+              }
+            });
+            return <CodeBlock className={className}>{children}</CodeBlock>;
+          },
           h1: ({ children }) => (
             <HeadingWithAnchor
               id={slugify(String(children))}

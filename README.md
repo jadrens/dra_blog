@@ -21,3 +21,5 @@ date: 2026-05-15
 lang: en
 ---
 ```
+
+If you want to edit the contents, please raise pr to master, and it would be merged to run.

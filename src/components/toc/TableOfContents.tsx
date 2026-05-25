@@ -184,6 +184,7 @@ export default function TableOfContents() {
         pt: 1,
         pb: 2,
         mr: 1,
+        zIndex: 1,
         borderRight: 1,
         borderColor: "divider",
         bgcolor: "background.paper",

@@ -27,7 +27,7 @@ function HeadingWithAnchor({
   id: string;
   children: React.ReactNode;
   sx?: object;
-  level: 1 | 2 | 3;
+  level: 1 | 2 | 3 | 4 | 5 | 6;
 }) {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -44,6 +44,9 @@ function HeadingWithAnchor({
     1: "H1",
     2: "H2",
     3: "H3",
+    4: "H4",
+    5: "H5",
+    6: "H6",
   }[level];
 
   return (
@@ -194,6 +197,18 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
           mt: 3, mb: 1, mx: { xs: 3, sm: 2 }, fontWeight: "bold", fontSize: "1.25rem",
           transition: 'all 0.3s ease',
         },
+        "& h4": {
+          mt: 2, mb: 1, mx: { xs: 3, sm: 2 }, fontWeight: "bold", fontSize: "1.1rem",
+          transition: 'all 0.3s ease',
+        },
+        "& h5": {
+          mt: 2, mb: 1, mx: { xs: 3, sm: 2 }, fontWeight: "bold", fontSize: "1rem",
+          transition: 'all 0.3s ease',
+        },
+        "& h6": {
+          mt: 2, mb: 1, mx: { xs: 3, sm: 2 }, fontWeight: "bold", fontSize: "0.9rem",
+          transition: 'all 0.3s ease',
+        },
         "& p": { mb: 2, mx: { xs: 3, sm: 2 }, lineHeight: 1.7, color: "text.secondary" },
         "& ul, & ol": { mb: 2, pl: 4, mx: { xs: 3, sm: 2 } },
         "& li": { mb: 0.5 },
@@ -254,6 +269,33 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
               id={slugify(String(children))}
               sx={{ fontSize: "1.25rem", fontWeight: "bold", mt: 3, mb: 1}}
               level={3}
+            >
+              {children}
+            </HeadingWithAnchor>
+          ),
+          h4: ({ children }) => (
+            <HeadingWithAnchor
+              id={slugify(String(children))}
+              sx={{ fontSize: "1.1rem", fontWeight: "bold", mt: 2, mb: 1}}
+              level={4}
+            >
+              {children}
+            </HeadingWithAnchor>
+          ),
+          h5: ({ children }) => (
+            <HeadingWithAnchor
+              id={slugify(String(children))}
+              sx={{ fontSize: "1rem", fontWeight: "bold", mt: 2, mb: 1}}
+              level={5}
+            >
+              {children}
+            </HeadingWithAnchor>
+          ),
+          h6: ({ children }) => (
+            <HeadingWithAnchor
+              id={slugify(String(children))}
+              sx={{ fontSize: "0.9rem", fontWeight: "bold", mt: 2, mb: 1}}
+              level={6}
             >
               {children}
             </HeadingWithAnchor>

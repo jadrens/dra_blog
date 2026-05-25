@@ -22,8 +22,8 @@ import {
   InputAdornment,
   Paper,
   List as MuiList,
-  Chip,
   CircularProgress,
+  Portal,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
@@ -31,7 +31,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import HomeIcon from "@mui/icons-material/Home";
 import ArticleIcon from "@mui/icons-material/Article";
 import PersonIcon from "@mui/icons-material/Person";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import ThemeToggle from "../navigation/ThemeToggle";
 import LocaleSwitcher from "../navigation/LocaleSwitcher";
 import { useI18n } from "@/lib/i18n";
@@ -56,8 +55,12 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
+  
+  // 统一的搜索框引用
+  const searchBoxRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [searchBoxRect, setSearchBoxRect] = useState<DOMRect | null>(null);
+  
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -69,6 +72,7 @@ export default function Navbar() {
     { key: "about", href: "/about" },
   ] as const;
 
+  // 键盘快捷键监听
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -89,6 +93,7 @@ export default function Navbar() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // 搜索请求
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (!searchQuery.trim()) {
@@ -118,6 +123,52 @@ export default function Navbar() {
 
   const showResults = searchFocused && (searchQuery.trim().length > 0 || searchResults.length > 0);
 
+  // 聚焦时计算搜索框位置
+  const handleSearchFocus = () => {
+    setSearchFocused(true);
+    if (searchBoxRef.current) {
+      setSearchBoxRect(searchBoxRef.current.getBoundingClientRect());
+    }
+  };
+
+  // 共用的搜索结果下拉菜单
+  const searchDropdown = (
+    <Portal>
+      <Paper
+        elevation={8}
+        sx={{
+          position: "fixed",
+          top: searchBoxRect ? searchBoxRect.bottom + 4 : 0,
+          left: searchBoxRect ? searchBoxRect.left : 0,
+          width: searchBoxRect ? searchBoxRect.width : 300,
+          maxHeight: 400,
+          overflow: "auto",
+          zIndex: 9999,
+          borderRadius: 1.5,
+        }}
+      >
+        {searchLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+            <CircularProgress size={20} />
+          </Box>
+        ) : searchResults.length === 0 ? (
+          <Typography color="text.secondary" sx={{ textAlign: "center", py: 2, fontSize: "0.875rem" }}>
+            {t.search.noResults}
+          </Typography>
+        ) : (
+          <MuiList dense>
+            {searchResults.map((result) => (
+              <ListItem sx={{ cursor: "pointer" }} key={result.slug} disablePadding>
+                <ListItemButton onClick={() => handleResultClick(result.slug)} sx={{ py: 1 }}>
+                  <ListItemText primary={result.title} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </MuiList>
+        )}
+      </Paper>
+    </Portal>
+  );
 
   return (
     <>
@@ -139,9 +190,10 @@ export default function Navbar() {
             href="/"
             src="/avatar.png"
             alt="dragonren"
-            sx={{ width: 32, height: 32, flexShrink: 0 ,flexGrow: 0}}
+            sx={{ width: 32, height: 32, flexShrink: 0, flexGrow: 0 }}
           />
 
+          {/* 移动端布局 */}
           {isMobile ? (
             <Box sx={{ display: "flex", alignItems: "center", flexDirection: "row-reverse", flexGrow: 1, gap: 1 }}>
               <ThemeToggle />
@@ -154,7 +206,8 @@ export default function Navbar() {
               </IconButton>
             </Box>
           ) : (
-            <Box sx={{ display: "flex", gap: 1, alignItems: "center",flexDirection: "row-reverse", flexGrow: 1 }}>
+            /* 桌面端布局 */
+            <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexDirection: "row-reverse", flexGrow: 1 }}>
               {navItems.map((item) => (
                 <Button
                   key={item.href}
@@ -166,20 +219,17 @@ export default function Navbar() {
                 </Button>
               ))}
 
-
               <LocaleSwitcher />
               <ThemeToggle />
 
-
-
-              <Box ref={searchRef} sx={{ position: "relative", flexShrink: 0, flexGrow: 1, display: "flex", alignItems: "center",justifyContent: "flex-end", zIndex: 3 }}>
+              <Box ref={searchBoxRef} sx={{ position: "relative", flexShrink: 0, flexGrow: 1, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
                 <TextField
                   inputRef={inputRef}
                   size="small"
                   placeholder={t.search.placeholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setSearchFocused(true)}
+                  onFocus={handleSearchFocus}
                   onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
                   slotProps={{
                     input: {
@@ -208,50 +258,16 @@ export default function Navbar() {
                     },
                   }}
                 />
-                {showResults && (
-                  <Paper
-                    elevation={8}
-                    sx={{
-                      position: "absolute",
-                      top: "100%",
-                      mt: 0.5,
-                      left: 0,
-                      right: 0,
-                      maxHeight: 400,
-                      overflow: "auto",
-                      zIndex: theme.zIndex.tooltip,
-                      borderRadius: 1.5,
-                    }}
-                  >
-                    {searchLoading ? (
-                      <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-                        <CircularProgress size={20} />
-                      </Box>
-                    ) : searchResults.length === 0 ? (
-                      <Typography color="text.secondary" sx={{ textAlign: "center", py: 2, fontSize: "0.875rem" }}>
-                        {t.search.noResults}
-                      </Typography>
-                    ) : (
-                      <MuiList  dense>
-                        {searchResults.map((result) => (
-                          <ListItem sx={{ cursor: "pointer" }} key={result.slug} disablePadding>
-                            <ListItemButton onClick={() => handleResultClick(result.slug)} sx={{ py: 1 }}>
-                              <ListItemText
-                                primary={result.title}
-                              />
-                            </ListItemButton>
-                          </ListItem>
-                        ))}
-                      </MuiList>
-                    )}
-                  </Paper>
-                )}
               </Box>
             </Box>
           )}
         </Toolbar>
       </AppBar>
 
+      {/* 共用的搜索结果下拉菜单 */}
+      {showResults && searchBoxRect && searchDropdown}
+
+      {/* 移动端 Drawer */}
       <Drawer
         anchor="right"
         open={drawerOpen}
@@ -277,6 +293,7 @@ export default function Navbar() {
             pt: 2,
           }}
         >
+          {/* Drawer 头部 */}
           <Box
             sx={{
               display: "flex",
@@ -308,67 +325,42 @@ export default function Navbar() {
             </IconButton>
           </Box>
 
-          <Box sx={{ px: 2, py: 2, position: "relative" }}>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder={t.search.placeholder}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => setSearchFocused(true)}
-              onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ fontSize: 18, color: "text.secondary" }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: searchLoading ? (
-                    <InputAdornment position="end">
-                      <CircularProgress size={16} />
-                    </InputAdornment>
-                  ) : null,
-                },
-              }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                  bgcolor: alpha(theme.palette.action.hover, 0.04),
-                },
-              }}
-            />
-            {searchResults.length > 0 && (
-              <Paper
-                elevation={8}
-                sx={{
-                  position: "absolute",
-                  top: "100%",
-                  mt: 0.5,
-                  left: 16,
-                  right: 16,
-                  maxHeight: 300,
-                  overflow: "auto",
-                  borderRadius: 2,
-                  zIndex: theme.zIndex.tooltip,
+          {/* 移动端搜索框 */}
+          <Box sx={{ px: 2, py: 2 }}>
+            <Box ref={searchBoxRef}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder={t.search.placeholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={handleSearchFocus}
+                onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: searchLoading ? (
+                      <InputAdornment position="end">
+                        <CircularProgress size={16} />
+                      </InputAdornment>
+                    ) : null,
+                  },
                 }}
-              >
-                <MuiList dense>
-                  {searchResults.map((result) => (
-                    <ListItem key={result.slug} disablePadding>
-                      <ListItemButton
-                        onClick={() => handleResultClick(result.slug)}
-                        sx={{ py: 1 }}
-                      >
-                        <ListItemText primary={result.title} />
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                </MuiList>
-              </Paper>
-            )}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                    bgcolor: alpha(theme.palette.action.hover, 0.04),
+                  },
+                }}
+              />
+            </Box>
           </Box>
 
+          {/* 导航项 */}
           <MuiList sx={{ px: 2, flex: 1 }}>
             {navItems.map((item, index) => {
               const icons = [<HomeIcon key="home" />, <ArticleIcon key="posts" />, <PersonIcon key="about" />];
@@ -419,6 +411,7 @@ export default function Navbar() {
             })}
           </MuiList>
 
+          {/* Drawer 底部 */}
           <Box
             sx={{
               px: 3,

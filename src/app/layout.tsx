@@ -41,7 +41,6 @@ export default function RootLayout({
         <I18nProvider>
           <LoadingBar />
           {children}
-          <Footer />
         </I18nProvider>
       </ThemeRegistry>
       </body>

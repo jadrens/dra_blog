@@ -6,6 +6,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { useReadingProgress, Heading } from "../reading/ReadingProgressContext";
 import { useI18n } from "@/lib/i18n";
+import { tocDesktopWidth } from "@/var/toc";
 
 const NAV_HEIGHT = 64;
 const ITEM_HEIGHT = 32; // estimated height per item
@@ -173,7 +174,7 @@ export default function TableOfContents() {
     <Box
       ref={listRef}
       sx={{
-        width: 250,
+        width: tocDesktopWidth,
         flexShrink: 0,
         position: "sticky",
         top: navVisible ? 64 : 0,

@@ -26,6 +26,8 @@ export default function BackToTopButton() {
         onClick={handleClick}
         aria-label="Back to top"
         sx={{
+          width: 40,
+          height: 40,
           position: "fixed",
           bottom: 24,
           right: 24,

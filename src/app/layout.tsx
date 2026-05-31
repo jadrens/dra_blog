@@ -26,6 +26,12 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: SITE_CONFIG.siteName,
   description: SITE_CONFIG.description,
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
   other: {},
 };
 
@@ -35,7 +41,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${nunito.variable} ${inter.variable}`}>
+    <html lang="en" style={{ maxWidth: "100vw", overflowX: "hidden" ,hyphens: "auto", 
+      overflowWrap: "break-word"
+    }} suppressHydrationWarning className={`${nunito.variable} ${inter.variable}`}>
       <body className="min-h-full antialiased" suppressHydrationWarning>
         <ThemeRegistry>
         <I18nProvider>

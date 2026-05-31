@@ -13,6 +13,7 @@ import { usePathname } from "next/navigation";
 import TagIcon from "@mui/icons-material/Tag";
 import { useReadingProgress, slugify } from "../reading/ReadingProgressContext";
 import React from "react";
+import { tocDesktopWidth } from "@/var/toc";
 
 interface MarkdownContentProps {
   content: string;
@@ -53,7 +54,7 @@ function HeadingWithAnchor({
     <Tag
       id={id}
       data-heading-id={id}
-      style={{ scrollMarginTop: "80px", position: "relative", left: -30}}
+      style={{ scrollMarginTop: "80px", position: "relative", marginLeft: "0" }}
     >
       <Box
         component="span"
@@ -77,7 +78,11 @@ function HeadingWithAnchor({
         elevation={0}
         onClick={handleClick}
         sx={{
-          display: "inline-flex",
+          maxWidth: "100%",
+          overflow: "hidden",
+          wordBreak: "break-all",
+          overflowWrap: "anywhere",
+          // display: "inline-flex",
           alignItems: "center",
           gap: 0.5,
           px: 1,
@@ -94,7 +99,7 @@ function HeadingWithAnchor({
         }}
       >
         <TagIcon sx={{ fontSize: "0.9em", color: "text.secondary" }} />
-        <span style={{ fontWeight: "inherit", fontSize: "inherit", padding: "0 30px 0 5px", margin: 0, borderRadius: "4px"}}>{children}</span>
+        <span style={{fontWeight: "inherit", fontSize: "inherit", padding: "0 5px", margin: 0, borderRadius: "4px"}}>{children}</span>
       </Paper>
     </Tag>
   );
@@ -185,6 +190,10 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
     <Box
       ref={contentRef}
       sx={{
+        maxWidth: {
+          xs: "100vw",
+          sm: `calc(100vw - ${tocDesktopWidth}px)`,
+        },
         "& h1": {
           mt: 4, mb: 2, mx: { xs: 3, sm: 2 }, fontWeight: "bold", fontSize: "2rem",
           transition: 'all 0.3s ease',

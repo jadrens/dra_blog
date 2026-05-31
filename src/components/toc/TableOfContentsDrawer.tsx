@@ -7,6 +7,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { useState, useEffect } from "react";
 import { useReadingProgress, Heading } from "../reading/ReadingProgressContext";
 import { useI18n } from "@/lib/i18n";
+import { tocMobileWidth } from "@/var/toc";
 
 interface TocItemProps {
   heading: Heading;
@@ -117,7 +118,11 @@ export default function TableOfContentsDrawer({ open, onClose }: TableOfContents
       onClose={onClose}
       sx={{
         display: { xs: "block", sm: "none" },
-        "& .MuiDrawer-paper": { width: 280, boxSizing: "border-box" },
+        "& .MuiDrawer-paper": {
+          width: `min(${tocMobileWidth}px, 100vw)`,
+          maxWidth: "100vw",
+          boxSizing: "border-box"
+        },
       }}
     >
       <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: 1, borderColor: "divider" }}>

@@ -1,71 +1,46 @@
-import initSqlJs, { Database as SqlJsDatabase } from "sql.js";
+import { Database } from "bun:sqlite";
+import { mkdirSync } from "node:fs";
 import path from "path";
-import fs from "fs";
 
 const dataDir = path.join(process.cwd(), "data");
 const dbPath = path.join(dataDir, "views.db");
-const wasmPath = path.join(process.cwd(), "node_modules/sql.js/dist/sql-wasm.wasm");
 
-let db: SqlJsDatabase | null = null;
+// 确保目录存在
+mkdirSync(dataDir, { recursive: true });
 
-async function getDb(): Promise<SqlJsDatabase> {
-  if (db) return db;
+// 打开或创建数据库
+const db = new Database(dbPath, { create: true });
 
-  const SQL = await initSqlJs({
-    locateFile: () => wasmPath,
-  });
+// 初始化表
+db.run(`
+  CREATE TABLE IF NOT EXISTS views (
+    slug TEXT PRIMARY KEY,
+    count INTEGER DEFAULT 0
+  )
+`);
 
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
+// 预编译语句
+const selectViews = db.query("SELECT count FROM views WHERE slug = ?");
+const insertView = db.query("INSERT INTO views (slug, count) VALUES (?, 1)");
+const updateView = db.query("UPDATE views SET count = count + 1 WHERE slug = ?");
+const selectAllViews = db.query("SELECT slug, count FROM views");
 
-  if (fs.existsSync(dbPath)) {
-    const buffer = fs.readFileSync(dbPath);
-    db = new SQL.Database(buffer);
+export function getPostViews(slug: string): number {
+  const result = selectViews.get(slug) as { count: number } | null;
+  return result?.count ?? 0;
+}
+
+export function incrementPostViews(slug: string): void {
+  const result = selectViews.get(slug);
+  
+  if (result === null) {
+    insertView.run(slug);
   } else {
-    db = new SQL.Database();
-    db.run(`
-      CREATE TABLE views (
-        slug TEXT PRIMARY KEY,
-        count INTEGER DEFAULT 0
-      )
-    `);
-    saveDb();
-  }
-
-  return db;
-}
-
-function saveDb(): void {
-  if (db) {
-    const data = db.export();
-    const buffer = Buffer.from(data);
-    fs.writeFileSync(dbPath, buffer);
+    updateView.run(slug);
   }
 }
 
-export async function getPostViews(slug: string): Promise<number> {
-  const database = await getDb();
-  const result = database.exec(`SELECT count FROM views WHERE slug = '${slug}'`);
-  return result[0]?.values[0]?.[0] as number ?? 0;
-}
-
-export async function incrementPostViews(slug: string): Promise<void> {
-  const database = await getDb();
-  const result = database.exec(`SELECT count FROM views WHERE slug = '${slug}'`);
-
-  if (result.length === 0 || result[0].values.length === 0) {
-    database.run(`INSERT INTO views (slug, count) VALUES ('${slug}', 1)`);
-  } else {
-    database.run(`UPDATE views SET count = count + 1 WHERE slug = '${slug}'`);
-  }
-  saveDb();
-}
-
-export async function getAllPostViews(): Promise<Record<string, number>> {
-  const database = await getDb();
-  const result = database.exec("SELECT slug, count FROM views");
-  if (!result[0]) return {};
-  const rows = result[0].values as [string, number][];
-  return Object.fromEntries(rows);
+export function getAllPostViews(): Record<string, number> {
+  const rows = selectAllViews.all() as Array<{ slug: string; count: number }>;
+  return Object.fromEntries(rows.map(r => [r.slug, r.count]));
 }

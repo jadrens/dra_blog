@@ -3,6 +3,45 @@
 import { useEffect, useRef, useState } from "react";
 import Matter from "matter-js";
 
+// --- Simplex-like noise (self-contained, no dependency) ---
+function hash(x: number, y: number, z: number): number {
+  let n = Math.sin(x * 127.1 + y * 311.7 + z * 74.7) * 43758.5453;
+  return n - Math.floor(n);
+}
+
+function smoothNoise(x: number, y: number, z: number): number {
+  const ix = Math.floor(x);
+  const iy = Math.floor(y);
+  const iz = Math.floor(z);
+  const fx = x - ix;
+  const fy = y - iy;
+  const fz = z - iz;
+
+  // Smoothstep
+  const ux = fx * fx * (3 - 2 * fx);
+  const uy = fy * fy * (3 - 2 * fy);
+  const uz = fz * fz * (3 - 2 * fz);
+
+  const a = hash(ix, iy, iz);
+  const b = hash(ix + 1, iy, iz);
+  const c = hash(ix, iy + 1, iz);
+  const d = hash(ix + 1, iy + 1, iz);
+  const e = hash(ix, iy, iz + 1);
+  const f = hash(ix + 1, iy, iz + 1);
+  const g = hash(ix, iy + 1, iz + 1);
+  const h = hash(ix + 1, iy + 1, iz + 1);
+
+  return a + (b - a) * ux +
+    (c - a) * uy + (a - b - c + d) * ux * uy +
+    (e - a) * uz + (a - b - e + f) * ux * uz +
+    (a - c - e + g) * uy * uz +
+    (-a + b + c - d + e - f - g + h) * ux * uy * uz;
+}
+
+function noise3D(x: number, y: number, z: number): number {
+  return smoothNoise(x, y, z) * 2 - 1; // [-1, 1]
+}
+
 const CONFETTI_SVGS: { src: string; w: number; h: number; weight: number }[] = [
   { src: "/backgrounds/confetti/blue-line-short.svg", w: 80, h: 40, weight: 1.5 },
   { src: "/backgrounds/confetti/gold-line-short.svg", w: 80, h: 40, weight: 1.5 },
@@ -33,7 +72,7 @@ const CONFETTI_SVGS: { src: string; w: number; h: number; weight: number }[] = [
 export default function ConfettiBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<Map<string, HTMLImageElement>>(new Map());
-  const mouseRef = useRef({ x: -1000, y: -1000 });
+  const mouseRef = useRef({ x: -1000, y: -1000, active: false });
   const [imagesLoaded, setImagesLoaded] = useState(false);
 
   useEffect(() => {
@@ -74,16 +113,20 @@ export default function ConfettiBackground() {
     window.addEventListener("resize", resize);
 
     const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
+      mouseRef.current = { x: e.clientX, y: e.clientY, active: true };
+    };
+    const handleMouseLeave = () => {
+      mouseRef.current.active = false;
     };
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseleave", handleMouseLeave);
 
     const Engine = Matter.Engine.create({ gravity: { x: 0, y: 0 } });
     const { World, Bodies, Body, Events, Runner, Composite } = Matter;
 
     const width = canvas.width;
     const height = canvas.height;
-    const wallThickness = 150;
+    const wallThickness = 200;
 
     const walls = [
       Bodies.rectangle(width / 2, -wallThickness / 2, width, wallThickness, { isStatic: true, restitution: 0.8 }),
@@ -93,7 +136,19 @@ export default function ConfettiBackground() {
     ];
     World.add(Engine.world, walls);
 
-    const confettiCount = Math.floor((width * height) / 50000);
+    // --- Depth layering: background (0), mid (1), foreground (2) ---
+    type DepthLayer = 0 | 1 | 2;
+    const depthConfig: Record<DepthLayer, { scaleRange: [number, number]; frictionAir: number; opacity: number; blur: number; driftFactor: number }> = {
+      0: { scaleRange: [0.2, 0.35], frictionAir: 0.05, opacity: 0.3, blur: 2, driftFactor: 0.35 },
+      1: { scaleRange: [0.35, 0.6], frictionAir: 0.035, opacity: 0.65, blur: 0.5, driftFactor: 0.9 },
+      2: { scaleRange: [0.55, 0.85], frictionAir: 0.02, opacity: 1.0, blur: 0, driftFactor: 1.8 },
+    };
+
+    // Nonlinear particle scaling — density feels right across screen sizes
+    const area = width * height;
+    const baseArea = 390 * 844; // Reference phone resolution
+    const rawCount = Math.floor(26 * Math.pow(area / baseArea, 0.5));
+    const confettiCount = Math.max(24, Math.min(80, rawCount));
     for (let i = 0; i < confettiCount; i++) {
       const totalWeight = CONFETTI_SVGS.reduce((sum, s) => sum + s.weight, 0);
       let random = Math.random() * totalWeight;
@@ -105,27 +160,48 @@ export default function ConfettiBackground() {
           break;
         }
       }
-      const scale = 0.4 + Math.random() * 0.4;
-      const w = svgInfo.w * scale;
-      const h = svgInfo.h * scale;
+
+      // Depth assignment: weighted random (more background, less foreground)
+      const depthRoll = Math.random();
+      const depth: DepthLayer = depthRoll < 0.35 ? 0 : depthRoll < 0.75 ? 1 : 2;
+      const cfg = depthConfig[depth];
+
+      const baseScale = cfg.scaleRange[0] + Math.random() * (cfg.scaleRange[1] - cfg.scaleRange[0]);
+      const w = svgInfo.w * baseScale;
+      const h = svgInfo.h * baseScale;
       const x = Math.random() * width;
       const y = Math.random() * height;
 
       const body = Bodies.rectangle(x, y, w, h, {
         restitution: 0.6,
         friction: 0.001,
-        frictionAir: 0.02,
+        frictionAir: cfg.frictionAir,
         angle: Math.random() * Math.PI * 2,
         density: 0.001,
       });
 
-      Body.setVelocity(body, { x: (Math.random() - 0.5) * 0.3, y: (Math.random() - 0.5) * 0.3 });
-      Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.005);
+      Body.setVelocity(body, { x: (Math.random() - 0.5) * 0.5, y: (Math.random() - 0.5) * 0.5 });
+      Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.002);
 
       (body as any).svgKey = svgInfo.src;
-      (body as any).scale = scale;
-      (body as any).driftPhase = Math.random() * Math.PI * 2;
-      (body as any).driftFreq = 0.2 + Math.random() * 0.3;
+      (body as any).baseScale = baseScale;
+      (body as any).depth = depth;
+      (body as any).depthConfig = cfg;
+
+      // Noise offset per body for variety
+      (body as any).noiseOffsetX = Math.random() * 1000;
+      (body as any).noiseOffsetY = Math.random() * 1000;
+      (body as any).noiseOffsetZ = Math.random() * 1000;
+
+      // Sleep-like energy (0=almost still, 1=full movement)
+      (body as any).energy = 0.3 + Math.random() * 0.5;
+      (body as any).energyPhase = Math.random() * Math.PI * 2;
+
+      // Wobble params for soft rotation feel
+      (body as any).wobbleFreq = 0.3 + Math.random() * 0.4;
+      (body as any).wobblePhase = Math.random() * Math.PI * 2;
+      (body as any).wobbleAmp = 0.05 + Math.random() * 0.1;
+
       World.add(Engine.world, body);
     }
 
@@ -134,29 +210,57 @@ export default function ConfettiBackground() {
       time += 0.016;
       const mouse = mouseRef.current;
 
+      // Global slow drift (world breathing)
+      const globalFlowX = Math.sin(time * 0.03) * 0.000005;
+      const globalFlowY = Math.cos(time * 0.025) * 0.000005;
+
       Composite.allBodies(Engine.world).forEach((body: Matter.Body) => {
         if (body.isStatic) return;
 
-        const phase = (body as any).driftPhase || 0;
-        const freq = (body as any).driftFreq || 0.3;
+        const cfg = (body as any).depthConfig;
+        const energy = (body as any).energy as number;
+        const noiseZ = (body as any).noiseOffsetZ as number;
 
-        // Each body has unique random drift direction
-        const forceScale = 0.00002;
+        // Noise flow field for organic fluid movement
+        const nx = (body as any).noiseOffsetX as number;
+        const ny = (body as any).noiseOffsetY as number;
+        const noiseVal = noise3D(
+          (body.position.x + nx) * 0.0008,
+          (body.position.y + ny) * 0.0008,
+          time * 0.24 + noiseZ
+        );
+
+        const angle = noiseVal * Math.PI * 2;
+        const forceScale = 0.00006 * cfg.driftFactor * energy;
+
         Body.applyForce(body, body.position, {
-          x: Math.sin(time * freq + phase) * forceScale,
-          y: Math.cos(time * freq + phase * 1.5) * forceScale,
+          x: Math.cos(angle) * forceScale + globalFlowX,
+          y: Math.sin(angle) * forceScale + globalFlowY,
         });
 
-        // Mouse push effect
-        const dx = body.position.x - mouse.x;
-        const dy = body.position.y - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 150 && dist > 0) {
-          const pushForce = 0.0003 * (1 - dist / 150);
+        // Occasional micro-impulse (like being caught in a slow current)
+        if (Math.random() < 0.0008) {
           Body.applyForce(body, body.position, {
-            x: (dx / dist) * pushForce,
-            y: (dy / dist) * pushForce,
+            x: (Math.random() - 0.5) * 0.00005 * energy,
+            y: (Math.random() - 0.5) * 0.00005 * energy,
           });
+        }
+
+        // --- Swirl mouse interaction (tangential vortex, not radial push) ---
+        if (mouse.active) {
+          const dx = body.position.x - mouse.x;
+          const dy = body.position.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 260 && dist > 5) {
+            // Tangential direction (perpendicular to radial)
+            const tangentX = -dy / dist;
+            const tangentY = dx / dist;
+            const swirlForce = 0.00022 * (1 - dist / 260) * (energy * 0.5 + 0.5);
+            Body.applyForce(body, body.position, {
+              x: tangentX * swirlForce,
+              y: tangentY * swirlForce,
+            });
+          }
         }
       });
     });
@@ -166,6 +270,8 @@ export default function ConfettiBackground() {
 
     let frameId: number;
     const render = () => {
+      // --- Cream haze: semi-transparent overlay for motion trails ---
+      // Uses transparent fill (respects dark background), no color cast
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       Composite.allBodies(Engine.world).forEach((body: Matter.Body) => {
@@ -173,12 +279,37 @@ export default function ConfettiBackground() {
         const svgKey = (body as any).svgKey as string;
         const img = imagesRef.current.get(svgKey);
         if (!img) return;
-        const scale = (body as any).scale as number;
+
+        const baseScale = (body as any).baseScale as number;
+        const cfg = (body as any).depthConfig;
+        const wobbleFreq = (body as any).wobbleFreq as number;
+        const wobblePhase = (body as any).wobblePhase as number;
+        const wobbleAmp = (body as any).wobbleAmp as number;
 
         ctx.save();
         ctx.translate(body.position.x, body.position.y);
-        ctx.rotate(body.angle);
-        ctx.drawImage(img, -img.width * scale / 2, -img.height * scale / 2, img.width * scale, img.height * scale);
+
+        // Wobble rotation: soft, creamy翻动
+        const wobble = Math.sin(time * wobbleFreq + wobblePhase) * wobbleAmp;
+        ctx.rotate(body.angle + wobble);
+
+        // Depth-based blur (soft shadow for depth)
+        if (cfg.blur > 0) {
+          ctx.shadowBlur = cfg.blur * 4;
+          ctx.shadowColor = "rgba(255,255,255,0.12)";
+        }
+
+        // Opacity from depth config
+        ctx.globalAlpha = cfg.opacity;
+
+        ctx.drawImage(
+          img,
+          -img.width * baseScale / 2,
+          -img.height * baseScale / 2,
+          img.width * baseScale,
+          img.height * baseScale
+        );
+
         ctx.restore();
       });
 
@@ -189,6 +320,7 @@ export default function ConfettiBackground() {
     return () => {
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseleave", handleMouseLeave);
       Runner.stop(runner);
       Matter.Engine.clear(Engine);
       cancelAnimationFrame(frameId);

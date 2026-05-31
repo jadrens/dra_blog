@@ -56,33 +56,17 @@ function HeadingWithAnchor({
       data-heading-id={id}
       style={{ scrollMarginTop: "80px", position: "relative", marginLeft: "0" }}
     >
-      <Box
-        component="span"
-        sx={{
-          position: "absolute",
-          left: 0,
-          top: 20,
-          fontSize: "0.5em",
-          color: "text.disabled",
-          fontWeight: 500,
-          userSelect: "none",
-          opacity: 0.6,
-          zIndex: 3,
-          padding: "4px",
-        }}
-      >
-        {levelIndicator}
-      </Box>
       <Paper
         component="span"
         elevation={0}
         onClick={handleClick}
         sx={{
+          position: "relative",
           maxWidth: "100%",
           overflow: "hidden",
           wordBreak: "break-all",
           overflowWrap: "anywhere",
-          // display: "inline-flex",
+          display: "inline-flex",
           alignItems: "center",
           gap: 0.5,
           px: 1,
@@ -93,13 +77,22 @@ function HeadingWithAnchor({
           fontSize: "inherit",
           lineHeight: "inherit",
           bgcolor: "background.default",
-          "&:hover": { bgcolor: "action.selected", transform: "translateX(2px)" },
           transition: "all 0.2s ease",
+          "& .heading-hash": { position: "absolute", opacity: 1, transition: "opacity 0.2s ease", display: "flex", alignItems: "center" },
+          "& .heading-label": { opacity: 0, transition: "opacity 0.2s ease", display: "flex", alignItems: "center", fontWeight: 500, fontSize: "0.9em", color: "text.secondary" },
+          "&:hover": { bgcolor: "action.selected", transform: "translateX(2px)" },
+          "&:hover .heading-hash": { opacity: 0 },
+          "&:hover .heading-label": { opacity: 1 },
           ...sx,
         }}
       >
-        <TagIcon sx={{ fontSize: "0.9em", color: "text.secondary" }} />
-        <span style={{fontWeight: "inherit", fontSize: "inherit", padding: "0 5px", margin: 0, borderRadius: "4px"}}>{children}</span>
+        <span className="heading-hash">
+          <TagIcon sx={{ fontSize: "0.9em", color: "text.secondary" }} />
+        </span>
+        <span className="heading-label">
+          {levelIndicator}
+        </span>
+        <span style={{ fontWeight: "inherit", fontSize: "inherit", padding: "0 5px", margin: 0, borderRadius: "4px", position: "relative", zIndex: 1 }}>{children}</span>
       </Paper>
     </Tag>
   );

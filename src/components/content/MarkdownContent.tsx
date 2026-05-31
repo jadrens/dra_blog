@@ -53,13 +53,13 @@ function HeadingWithAnchor({
     <Tag
       id={id}
       data-heading-id={id}
-      style={{ scrollMarginTop: "80px", position: "relative" }}
+      style={{ scrollMarginTop: "80px", position: "relative", left: -30}}
     >
       <Box
         component="span"
         sx={{
           position: "absolute",
-          left: { xs: -8, sm: -10 },
+          left: 0,
           top: 20,
           fontSize: "0.5em",
           color: "text.disabled",

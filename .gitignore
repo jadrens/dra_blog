@@ -53,6 +53,7 @@ scripts/deploy.sh
 # claude
 CLAUDE.md
 AGENTS.md
+claude.md
 .claude/
 
 
@@ -60,3 +61,5 @@ AGENTS.md
 #pnpm files
 pnpm-lock.yaml
 pnpm-workspace.yaml
+
+bun.lock

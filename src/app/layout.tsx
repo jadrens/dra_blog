@@ -32,7 +32,9 @@ export const metadata: Metadata = {
     maximumScale: 1,
     userScalable: false,
   },
-  other: {},
+  other: {
+    "msvalidate.01": "C9AF28D7D9990442B295DAE8B746E316",
+  },
 };
 
 export default function RootLayout({

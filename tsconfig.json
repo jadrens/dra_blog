@@ -6,7 +6,9 @@
       "dom.iterable",
       "esnext"
     ],
-    "types": ["bun"],
+    "types": [
+      "bun"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -26,6 +28,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@style/*": [
+        "./src/style/*"
       ]
     }
   },
@@ -37,7 +42,9 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     "build/types/**/*.ts",
-    "build/dev/types/**/*.ts"
+    "build/dev/types/**/*.ts",
+    ".build/types/**/*.ts",
+    ".build/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

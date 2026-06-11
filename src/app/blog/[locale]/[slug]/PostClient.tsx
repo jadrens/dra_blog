@@ -10,7 +10,6 @@ import TextFieldsIcon from "@mui/icons-material/TextFields";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import EditIcon from "@mui/icons-material/Edit";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import MarkdownContent from "@/components/content/MarkdownContent";
 import TableOfContents from "@/components/toc/TableOfContents";
 import TableOfContentsDrawer from "@/components/toc/TableOfContentsDrawer";
 import FloatingTOCButton from "@/components/toc/FloatingTOCButton";
@@ -25,15 +24,17 @@ import { SITE_CONFIG } from "@/lib/config";
 interface PostClientProps {
   post: {
     slug: string;
-    title: string;
     date: string;
-    content: string;
+    word_count: number;
     tags: string[];
+    title: string;
   };
   views: number;
   slug: string;
   incrementView: (slug: string) => Promise<void>;
   locale: Locale;
+  title: React.ReactNode;
+  md_content: React.ReactNode;
 }
 
 function getRelativeTime(dateStr: string, t: any): string {
@@ -87,14 +88,14 @@ function getRelativeTime(dateStr: string, t: any): string {
   return `${s(seconds, ta.second, ta.seconds)}`;
 }
 
-function PostContent({ post, views, slug, incrementView, locale }: PostClientProps) {
+function PostContent({ post, views, slug, incrementView, locale, title, md_content }: PostClientProps) {
   const { t } = useI18n();
   const theme = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [localViews, setLocalViews] = useState(views);
   const [mounted, setMounted] = useState(false);
 
-  const wordCount = post.content.replace(/\s/g, "").length;
+  
 
   useScrollProgress();
 
@@ -123,9 +124,8 @@ function PostContent({ post, views, slug, incrementView, locale }: PostClientPro
             >
                             {t.blog.backToPosts}
             </Link>
-            <Typography color="text.primary" className="text-sm">
-              {post.title}
-            </Typography>
+            {title}
+            
           </Breadcrumbs>
           <article>
             <Box sx={{ mb: 4 }}>
@@ -180,7 +180,7 @@ function PostContent({ post, views, slug, incrementView, locale }: PostClientPro
                   />
                   <Chip
                     icon={<TextFieldsIcon />}
-                    label={`${wordCount} ${t.blog.characters}`}
+                    label={`${post.word_count} ${t.blog.characters}`}
                     size="small"
                     variant="outlined"
                     sx={{
@@ -224,7 +224,7 @@ function PostContent({ post, views, slug, incrementView, locale }: PostClientPro
                 animationFillMode: 'both',
               }}
             >
-              <MarkdownContent content={post.content} />
+              {md_content}
             </Box>
             <Box sx={{ mt: 4, pt: 2, borderTop: 1, borderColor: 'divider' }}>
               <Chip
@@ -259,10 +259,10 @@ function PostContent({ post, views, slug, incrementView, locale }: PostClientPro
   );
 }
 
-export default function PostClient({ post, views, slug, incrementView, locale }: PostClientProps) {
+export default function PostClient({ post, views, slug, incrementView, locale, title, md_content }: PostClientProps) {
   return (
     <ReadingProgressProvider>
-      <PostContent post={post} views={views} slug={slug} incrementView={incrementView} locale={locale} />
+      <PostContent post={post} views={views} slug={slug} incrementView={incrementView} locale={locale} title={title} md_content={md_content} />
     </ReadingProgressProvider>
   );
 }

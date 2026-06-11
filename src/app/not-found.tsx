@@ -2,7 +2,6 @@
 
 import { Box, Typography, Button } from "@mui/material";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 

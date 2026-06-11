@@ -3,6 +3,8 @@ import { getPostBySlug, Locale } from "@/lib/posts";
 import { getPostView, incrementView } from "../../actions";
 import PostClient from "./PostClient";
 import { Metadata } from "next";
+import MarkdownContent from "@/components/content/MarkdownContent";
+import { Typography } from "@mui/material";
 
 interface Props {
   params: Promise<{ slug: string; locale: Locale }>;
@@ -22,11 +24,25 @@ export const dynamic = 'force-dynamic';
 export default async function PostPage({ params }: Props) {
   const { slug, locale } = await params;
   const [post, views] = await Promise.all([getPostBySlug(slug, locale), getPostView(slug)]);
+  const wordCount = post.content.replace(/\s/g, "").length;
+  const date = post.date;
+  const client_post = {
+    date: date,
+    word_count: wordCount,
+    tags: post.tags,
+    slug: post.slug,
+    title: post.title
+  }
 
   return (
     <div className="min-h-screen flex flex-col" suppressHydrationWarning>
       <Navbar />
-      <PostClient post={post} views={views} slug={slug} incrementView={incrementView} locale={locale} />
+      <PostClient post={client_post} views={views} slug={slug} incrementView={incrementView} locale={locale}
+        title={<Typography color="text.primary" className="text-sm">
+              {post.title}
+            </Typography>}
+        md_content={<MarkdownContent content={post.content} />}
+      />
     </div>
   );
 }

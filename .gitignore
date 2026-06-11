@@ -60,3 +60,5 @@ claude.md
 
 #pnpm files
 pnpm-workspace.yaml
+
+.build

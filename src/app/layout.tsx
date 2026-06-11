@@ -4,11 +4,11 @@ import { Inter } from "next/font/google";
 import "@fontsource/jetbrains-mono/400.css";
 import "@fontsource/jetbrains-mono/500.css";
 import "./globals.css";
+import "@style/misans.css"
 import "katex/dist/katex.min.css";
 import ThemeRegistry from "@/components/layout/ThemeRegistry/ThemeRegistry";
 import { I18nProvider } from "@/lib/i18n";
 import LoadingBar from "@/components/layout/LoadingBar";
-import Footer from "@/components/layout/Footer";
 import { SITE_CONFIG } from "@/lib/config";
 
 const nunito = Nunito({
@@ -26,16 +26,17 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: SITE_CONFIG.siteName,
   description: SITE_CONFIG.description,
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   other: {
     "msvalidate.01": "C9AF28D7D9990442B295DAE8B746E316",
   },
 };
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
 
 export default function RootLayout({
   children,

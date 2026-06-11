@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Drawer, List, ListItem, ListItemButton, ListItemText, Collapse, Typography, IconButton, AppBar, Toolbar } from "@mui/material";
+import { Box, Drawer, List, ListItem, ListItemButton, ListItemText, Collapse, Typography, IconButton, AppBar, Toolbar, Tooltip } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -72,17 +72,20 @@ function TocItem({ heading, onSelect }: TocItemProps) {
               {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </Box>
           )}
-          <ListItemText
-            primary={
-              <Typography
-                variant={heading.level === 1 ? "body2" : "caption"}
-                noWrap
-                sx={{ fontWeight: heading.level === 1 ? 600 : 400, color: isActive ? "primary.main" : "text.primary" }}
-              >
-                {heading.text}
-              </Typography>
-            }
-          />
+          <Tooltip title={heading.text} placement="top" arrow>
+            <ListItemText
+              sx={{ flex: '1 1 auto', minWidth: 0, overflow: 'hidden' }}
+              primary={
+                <Typography
+                  variant={heading.level === 1 ? "body2" : "caption"}
+                  noWrap
+                  sx={{ fontWeight: heading.level === 1 ? 600 : 400, color: isActive ? "primary.main" : "text.primary" }}
+                >
+                  {heading.text}
+                </Typography>
+              }
+            />
+          </Tooltip>
         </ListItemButton>
       </ListItem>
       {hasChildren && (

@@ -22,7 +22,17 @@ export default function Home() {
               <Avatar
                 src="/avatar.png"
                 alt="Jadren Rayne"
-                sx={{ width: 120, height: 120 }}
+                sx={{
+                  width: 120,
+                  height: 120,
+                  "html[data-theme='dark'] &": {
+                    boxShadow: `
+                      0 0 30px 8px rgba(255, 255, 255, 0.09),
+                      0 0 80px 30px rgba(255, 190, 100, 0.09),
+                      0 0 160px 70px rgba(70, 76, 255, 0.09)
+                    `,
+                  },
+                }}
               />
               <StylizedName />
             </Box>

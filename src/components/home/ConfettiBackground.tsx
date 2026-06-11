@@ -74,6 +74,17 @@ export default function ConfettiBackground() {
   const imagesRef = useRef<Map<string, HTMLImageElement>>(new Map());
   const mouseRef = useRef({ x: -1000, y: -1000, active: false });
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const isDarkRef = useRef(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    isDarkRef.current = mql.matches;
+    const onChange = (e: MediaQueryListEvent) => {
+      isDarkRef.current = e.matches;
+    };
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     const loadImages = async () => {
@@ -294,7 +305,12 @@ export default function ConfettiBackground() {
         ctx.rotate(body.angle + wobble);
 
         // Depth-based blur (soft shadow for depth)
-        if (cfg.blur > 0) {
+        // In dark mode, give confetti a soft glow
+        if (isDarkRef.current) {
+          const glowIntensity = cfg.opacity;
+          ctx.shadowBlur = 6 + cfg.blur * 3;
+          ctx.shadowColor = `rgba(255, 240, 200, ${0.15 * glowIntensity})`;
+        } else if (cfg.blur > 0) {
           ctx.shadowBlur = cfg.blur * 4;
           ctx.shadowColor = "rgba(255,255,255,0.12)";
         }

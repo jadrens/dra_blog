@@ -52,7 +52,7 @@ export default function Footer() {
             variant="outlined"
             sx={{ p: 1.5 }}
           />
-          <Chip
+          {/* <Chip
             icon={<LinkIcon sx={{ fontSize: 14 }} />}
             label={t.footer.beian}
             component="a"
@@ -63,7 +63,7 @@ export default function Footer() {
             target="_blank"
             rel="noopener"
             sx={{ p: 1.5 }}
-          />
+          /> */}
           <Chip
             icon={<GitHubIcon sx={{ fontSize: 14 }} />}
             label="GitHub"

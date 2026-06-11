@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Box, IconButton, Tooltip, Typography, useTheme } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckIcon from "@mui/icons-material/Check";
@@ -44,6 +44,8 @@ const languageColorsLight: Record<string, string> = {
   java: "#8a4b1c",
   cpp: "#c93068",
   c: "#444444",
+  nginx: "#2e8c1c",
+  conf: "#2e8c1c",
 };
 const languageColorsDark: Record<string, string> = {
   javascript: "#f7df1e",
@@ -63,6 +65,8 @@ const languageColorsDark: Record<string, string> = {
   java: "#b07219",
   cpp: "#f34b7d",
   c: "#cccccc",
+  nginx: "#4EAA25",
+  conf: "#4EAA25",
 };
 
 const languageIcons: Record<string, string> = {
@@ -92,16 +96,43 @@ export default function CodeBlock({ children, className }: CodeBlockProps) {
   const { t } = useI18n();
   const language = className?.split(" ").at(-1)?.replace("language-", "") || "";
   const iconColor = (isDark ? languageColorsDark[language] : languageColorsLight[language]) || (isDark ? "#808080" : "#6d6d6d");
-  const LanguageIcon = <Icon 
-  path={languageIcons[language] || mdiCodeTags} 
-  size={0.6}
-  color={iconColor}
-  style={{ fontSize: "0.9rem" }}
-/>;
+  const isNginx = language === "nginx" || language === "conf";
+  const LanguageIcon = isNginx ? (
+    <Box
+      component="img"
+      src="/icons/nginx-icon.svg"
+      alt="nginx"
+      sx={{ width: "0.9rem", height: "0.9rem", display: "block" }}
+    />
+  ) : (
+    <Icon
+      path={languageIcons[language] || mdiCodeTags}
+      size={0.6}
+      color={iconColor}
+      style={{ fontSize: "0.9rem" }}
+    />
+  );
 
 
   const codeText = useMemo(() => extractText(children), [children]);
-  const lines = useMemo(() => codeText.split("\n"), [codeText]);
+
+  const highlightedChildren = useMemo(() => {
+    if (language !== "nginx" && language !== "conf") return children;
+
+    const tokens = tokenizeNginx(codeText);
+    return React.Children.map(children, (child) => {
+      if (React.isValidElement(child) && child.type === "code") {
+        return React.cloneElement(child, {
+          children: tokens.map((token, i) => (
+            <span key={i} style={{ color: getNginxTokenColor(token.type, isDark) }}>
+              {token.text}
+            </span>
+          )),
+        } as any);
+      }
+      return child;
+    });
+  }, [children, language, codeText, isDark]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(codeText);
@@ -237,11 +268,133 @@ export default function CodeBlock({ children, className }: CodeBlockProps) {
             },
           }}
         >
-          {children}
+          {highlightedChildren}
         </Box>
       </Box>
     </Box>
   );
+}
+
+interface NginxToken {
+  type: "comment" | "string" | "number" | "block" | "directive" | "variable" | "boolean" | "operator" | "plain";
+  text: string;
+}
+
+function tokenizeNginx(code: string): NginxToken[] {
+  const blockKeywords = new Set([
+    "http", "server", "events", "stream", "location", "upstream",
+    "mail", "types", "geo", "map", "limit_except", "if",
+  ]);
+  const directives = new Set([
+    "listen", "server_name", "root", "index", "proxy_pass", "return",
+    "rewrite", "ssl_certificate", "ssl_certificate_key", "include",
+    "access_log", "error_log", "proxy_set_header", "proxy_redirect",
+    "proxy_buffering", "proxy_read_timeout", "proxy_send_timeout",
+    "resolver", "ssl_protocols", "ssl_ciphers", "ssl_prefer_server_ciphers",
+    "proxy_ssl_server_name", "proxy_ssl_name", "proxy_ssl_protocols",
+    "sub_filter", "sub_filter_once", "sub_filter_types", "proxy_cookie_domain",
+    "proxy_buffer_size", "proxy_buffers", "proxy_busy_buffers_size",
+    "proxy_http_version", "proxy_ssl_session_reuse", "resolver_timeout",
+    "ssl_session_timeout", "ssl_session_cache", "add_header", "try_files",
+    "fastcgi_pass", "uwsgi_pass", "gzip", "expires", "charset",
+    "client_max_body_size", "worker_processes", "worker_connections",
+    "sendfile", "tcp_nopush", "tcp_nodelay", "keepalive_timeout",
+    "types_hash_max_size", "default_type", "log_format", "deny", "allow",
+    "alias", "valid_referers", "break", "last", "permanent", "redirect",
+  ]);
+  const booleans = new Set(["on", "off"]);
+
+  const tokens: NginxToken[] = [];
+  let i = 0;
+
+  while (i < code.length) {
+    // 行注释
+    if (code[i] === "#") {
+      let end = code.indexOf("\n", i);
+      if (end === -1) end = code.length;
+      tokens.push({ type: "comment", text: code.slice(i, end) });
+      i = end;
+      continue;
+    }
+
+    // 字符串
+    if (code[i] === '"' || code[i] === "'") {
+      const quote = code[i];
+      let j = i + 1;
+      while (j < code.length && code[j] !== quote) {
+        if (code[j] === "\\") j++;
+        j++;
+      }
+      if (j < code.length) j++;
+      tokens.push({ type: "string", text: code.slice(i, j) });
+      i = j;
+      continue;
+    }
+
+    // 数字
+    if (/\d/.test(code[i])) {
+      let j = i;
+      while (j < code.length && /[\d.]/.test(code[j])) j++;
+      tokens.push({ type: "number", text: code.slice(i, j) });
+      i = j;
+      continue;
+    }
+
+    // 变量
+    if (code[i] === "$") {
+      let j = i + 1;
+      while (j < code.length && /[a-zA-Z0-9_]/.test(code[j])) j++;
+      tokens.push({ type: "variable", text: code.slice(i, j) });
+      i = j;
+      continue;
+    }
+
+    // 标识符
+    if (/[a-zA-Z_]/.test(code[i])) {
+      let j = i;
+      while (j < code.length && /[a-zA-Z0-9_]/.test(code[j])) j++;
+      const word = code.slice(i, j);
+      if (blockKeywords.has(word)) {
+        tokens.push({ type: "block", text: word });
+      } else if (directives.has(word)) {
+        tokens.push({ type: "directive", text: word });
+      } else if (booleans.has(word)) {
+        tokens.push({ type: "boolean", text: word });
+      } else {
+        tokens.push({ type: "plain", text: word });
+      }
+      i = j;
+      continue;
+    }
+
+    // 操作符
+    if (code[i] === "{" || code[i] === "}" || code[i] === ";") {
+      tokens.push({ type: "operator", text: code[i] });
+      i++;
+      continue;
+    }
+
+    // 空白和其他字符作为 plain
+    tokens.push({ type: "plain", text: code[i] });
+    i++;
+  }
+
+  return tokens;
+}
+
+function getNginxTokenColor(type: NginxToken["type"], isDark: boolean): string {
+  const colors: Record<NginxToken["type"], { light: string; dark: string }> = {
+    comment: { light: "#6a737d", dark: "#6a9955" },
+    string: { light: "#032f62", dark: "#ce9178" },
+    number: { light: "#005cc5", dark: "#b5cea8" },
+    block: { light: "#22863a", dark: "#4ec9b0" },
+    directive: { light: "#d73a49", dark: "#569cd6" },
+    variable: { light: "#e36209", dark: "#9cdcfe" },
+    boolean: { light: "#6f42c1", dark: "#c586c0" },
+    operator: { light: "#24292e", dark: "#d4d4d4" },
+    plain: { light: "#24292e", dark: "#d4d4d4" },
+  };
+  return colors[type][isDark ? "dark" : "light"];
 }
 
 function extractText(node: React.ReactNode): string {

@@ -1,7 +1,17 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-31T11:08:33.225Z",
+  "generatedAt": "2026-06-11T04:09:47.232Z",
   "postsByDate": [
+    {
+      "slug": "github-mirror",
+      "title": "搭建了一个 GitHub 镜像站",
+      "date": "2026-06-11",
+      "tags": [
+        "website",
+        "mirror"
+      ],
+      "locale": "zh"
+    },
     {
       "slug": "markdown-test",
       "title": "Markdown 功能测试",
@@ -11,28 +21,33 @@
         "测试"
       ],
       "locale": "zh"
-    },
-    {
-      "slug": "1",
-      "title": "记一次向 Arch Linux 官方仓库提交代码的经历：重写 ntfs-3g 挂载逻辑",
-      "date": "2026-05-15",
-      "tags": [
-        "Arch Linux",
-        "Open Source",
-        "Linux Kernel",
-        "Shell"
-      ],
-      "locale": "zh"
-    },
-    {
-      "slug": "about-blog",
-      "title": "关于这个博客",
-      "date": "2026-05-14",
-      "tags": [],
-      "locale": "zh"
     }
   ],
   "postsByTag": {
+    "website": [
+      {
+        "slug": "github-mirror",
+        "title": "搭建了一个 GitHub 镜像站",
+        "date": "2026-06-11",
+        "tags": [
+          "website",
+          "mirror"
+        ],
+        "locale": "zh"
+      }
+    ],
+    "mirror": [
+      {
+        "slug": "github-mirror",
+        "title": "搭建了一个 GitHub 镜像站",
+        "date": "2026-06-11",
+        "tags": [
+          "website",
+          "mirror"
+        ],
+        "locale": "zh"
+      }
+    ],
     "Markdown": [
       {
         "slug": "markdown-test",
@@ -53,62 +68,6 @@
         "tags": [
           "Markdown",
           "测试"
-        ],
-        "locale": "zh"
-      }
-    ],
-    "Arch Linux": [
-      {
-        "slug": "1",
-        "title": "记一次向 Arch Linux 官方仓库提交代码的经历：重写 ntfs-3g 挂载逻辑",
-        "date": "2026-05-15",
-        "tags": [
-          "Arch Linux",
-          "Open Source",
-          "Linux Kernel",
-          "Shell"
-        ],
-        "locale": "zh"
-      }
-    ],
-    "Open Source": [
-      {
-        "slug": "1",
-        "title": "记一次向 Arch Linux 官方仓库提交代码的经历：重写 ntfs-3g 挂载逻辑",
-        "date": "2026-05-15",
-        "tags": [
-          "Arch Linux",
-          "Open Source",
-          "Linux Kernel",
-          "Shell"
-        ],
-        "locale": "zh"
-      }
-    ],
-    "Linux Kernel": [
-      {
-        "slug": "1",
-        "title": "记一次向 Arch Linux 官方仓库提交代码的经历：重写 ntfs-3g 挂载逻辑",
-        "date": "2026-05-15",
-        "tags": [
-          "Arch Linux",
-          "Open Source",
-          "Linux Kernel",
-          "Shell"
-        ],
-        "locale": "zh"
-      }
-    ],
-    "Shell": [
-      {
-        "slug": "1",
-        "title": "记一次向 Arch Linux 官方仓库提交代码的经历：重写 ntfs-3g 挂载逻辑",
-        "date": "2026-05-15",
-        "tags": [
-          "Arch Linux",
-          "Open Source",
-          "Linux Kernel",
-          "Shell"
         ],
         "locale": "zh"
       }

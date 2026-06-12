@@ -1,5 +1,5 @@
 export const SITE_CONFIG = {
-  baseUrl: "https://blog.dragonren.top",
+  baseUrl: "https://blog.rayou.me",
   siteName: "dragonren-blog",
   description: "A blog with markdown and LaTeX support",
   githubRepo: "https://github.com/jadrens/drablog",

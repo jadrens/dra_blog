@@ -4,17 +4,21 @@ import { SITE_CONFIG } from "@/lib/config";
 
 const locales: Locale[] = ["en", "zh"];
 
+function formatSitemapDate(date: Date): string {
+  return date.toISOString().split("T")[0];
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const allPages: MetadataRoute.Sitemap = [
     {
       url: SITE_CONFIG.baseUrl,
-      lastModified: new Date(),
+      lastModified: formatSitemapDate(new Date()),
       changeFrequency: "weekly",
       priority: 1,
     },
     {
       url: `${SITE_CONFIG.baseUrl}/about`,
-      lastModified: new Date(),
+      lastModified: formatSitemapDate(new Date()),
       changeFrequency: "monthly",
       priority: 0.5,
     },
@@ -24,7 +28,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const locale of locales) {
     allPages.push({
       url: `${SITE_CONFIG.baseUrl}/blog/${locale}`,
-      lastModified: new Date(),
+      lastModified: formatSitemapDate(new Date()),
       changeFrequency: "weekly",
       priority: 0.9,
     });
@@ -32,7 +36,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     const posts = getAllPosts(locale);
     const postPages = posts.map((post) => ({
       url: `${SITE_CONFIG.baseUrl}/blog/${locale}/${post.slug}`,
-      lastModified: new Date(post.date),
+      lastModified: formatSitemapDate(new Date(post.date)),
       changeFrequency: "monthly" as const,
       priority: 0.8,
     }));

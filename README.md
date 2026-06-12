@@ -1,6 +1,6 @@
 # My Blog
 
-Live: **https://blog.dragonren.top**
+Live: **https://blog.rayou.me**
 
 A personal blog built with Next.js, featuring markdown and LaTeX support.
 

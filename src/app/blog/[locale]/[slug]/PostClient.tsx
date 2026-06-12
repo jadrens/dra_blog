@@ -9,6 +9,7 @@ import EventIcon from "@mui/icons-material/Event";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import EditIcon from "@mui/icons-material/Edit";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import TableOfContents from "@/components/toc/TableOfContents";
 import TableOfContentsDrawer from "@/components/toc/TableOfContentsDrawer";
@@ -19,6 +20,7 @@ import { ReadingProgressProvider } from "@/components/reading/ReadingProgressCon
 import { useScrollProgress } from "@/hooks/useScrollProgress";
 import { useI18n } from "@/lib/i18n";
 import { Locale } from "@/lib/posts";
+import { PostMeta } from "@/lib/search-index";
 import { SITE_CONFIG } from "@/lib/config";
 
 interface PostClientProps {
@@ -35,6 +37,8 @@ interface PostClientProps {
   locale: Locale;
   title: React.ReactNode;
   md_content: React.ReactNode;
+  prev: PostMeta | null;
+  next: PostMeta | null;
 }
 
 function getRelativeTime(dateStr: string, t: any): string {
@@ -88,7 +92,7 @@ function getRelativeTime(dateStr: string, t: any): string {
   return `${s(seconds, ta.second, ta.seconds)}`;
 }
 
-function PostContent({ post, views, slug, incrementView, locale, title, md_content }: PostClientProps) {
+function PostContent({ post, views, slug, incrementView, locale, title, md_content, prev, next }: PostClientProps) {
   const { t } = useI18n();
   const theme = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -156,7 +160,7 @@ function PostContent({ post, views, slug, incrementView, locale, title, md_conte
                     animationFillMode: 'both',
                   }}
                 >
-                  <Tooltip title={getRelativeTime(post.date, t)}>
+                  <Tooltip title={getRelativeTime(post.date, t) + ` ${t.blog.timeAgo.ago}`} arrow>
                     <Chip
                       icon={<EventIcon />}
                       label={post.date}
@@ -226,6 +230,54 @@ function PostContent({ post, views, slug, incrementView, locale, title, md_conte
             >
               {md_content}
             </Box>
+            {(prev || next) && (
+              <Box
+                sx={{
+                  mt: 6,
+                  mb: 2,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  gap: 2,
+                  flexWrap: 'wrap',
+                  animation: mounted ? 'fadeIn 0.5s ease-out' : 'none',
+                  animationDelay: '0.6s',
+                  animationFillMode: 'both',
+                }}
+              >
+                <Box sx={{ display: 'flex', flex: 1, justifyContent: 'flex-start', minWidth: 0 }}>
+                  {prev && (
+                    <Tooltip title={`${t.blog.prevPost}: ${prev.title}`} arrow>
+                      <Chip
+                        component={Link}
+                        href={`/blog/${locale}/${prev.slug}`}
+                        icon={<ArrowBackIcon />}
+                        label={prev.title}
+                        aria-label={`${t.blog.prevPost}: ${prev.title}`}
+                        size="small"
+                        clickable
+                        sx={{ maxWidth: { xs: '100%', sm: 280 } }}
+                      />
+                    </Tooltip>
+                  )}
+                </Box>
+                <Box sx={{ display: 'flex', flex: 1, justifyContent: 'flex-end', minWidth: 0 }}>
+                  {next && (
+                    <Tooltip title={`${t.blog.nextPost}: ${next.title}`} arrow>
+                      <Chip
+                        component={Link}
+                        href={`/blog/${locale}/${next.slug}`}
+                        icon={<ArrowForwardIcon />}
+                        label={next.title}
+                        aria-label={`${t.blog.nextPost}: ${next.title}`}
+                        size="small"
+                        clickable
+                        sx={{ maxWidth: { xs: '100%', sm: 280 } }}
+                      />
+                    </Tooltip>
+                  )}
+                </Box>
+              </Box>
+            )}
             <Box sx={{ mt: 4, pt: 2, borderTop: 1, borderColor: 'divider' }}>
               <Chip
                 component="a"
@@ -259,10 +311,10 @@ function PostContent({ post, views, slug, incrementView, locale, title, md_conte
   );
 }
 
-export default function PostClient({ post, views, slug, incrementView, locale, title, md_content }: PostClientProps) {
+export default function PostClient({ post, views, slug, incrementView, locale, title, md_content, prev, next }: PostClientProps) {
   return (
     <ReadingProgressProvider>
-      <PostContent post={post} views={views} slug={slug} incrementView={incrementView} locale={locale} title={title} md_content={md_content} />
+      <PostContent post={post} views={views} slug={slug} incrementView={incrementView} locale={locale} title={title} md_content={md_content} prev={prev} next={next} />
     </ReadingProgressProvider>
   );
 }

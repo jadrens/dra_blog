@@ -11,6 +11,8 @@ export const en = {
     backToPosts: "Posts",
     characters: "chars",
     editOnGithub: "Edit on GitHub",
+    prevPost: "Previous",
+    nextPost: "Next",
     timeAgo: {
       year: "year",
       month: "month",
@@ -24,6 +26,7 @@ export const en = {
       hours: "hours",
       minutes: "minutes",
       seconds: "seconds",
+      ago: "ago",
     },
   },
   theme: {

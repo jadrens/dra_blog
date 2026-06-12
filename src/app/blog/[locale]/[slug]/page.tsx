@@ -1,5 +1,5 @@
 import Navbar from "@/components/layout/Navbar";
-import { getPostBySlug, Locale } from "@/lib/posts";
+import { getPostBySlug, getAdjacentPosts, Locale } from "@/lib/posts";
 import { getPostView, incrementView } from "../../actions";
 import PostClient from "./PostClient";
 import { Metadata } from "next";
@@ -23,7 +23,11 @@ export const dynamic = 'force-dynamic';
 
 export default async function PostPage({ params }: Props) {
   const { slug, locale } = await params;
-  const [post, views] = await Promise.all([getPostBySlug(slug, locale), getPostView(slug)]);
+  const [post, views, adjacent] = await Promise.all([
+    getPostBySlug(slug, locale),
+    getPostView(slug),
+    getAdjacentPosts(slug, locale),
+  ]);
   const wordCount = post.content.replace(/\s/g, "").length;
   const date = post.date;
   const client_post = {
@@ -42,6 +46,8 @@ export default async function PostPage({ params }: Props) {
               {post.title}
             </Typography>}
         md_content={<MarkdownContent content={post.content} />}
+        prev={adjacent.prev}
+        next={adjacent.next}
       />
     </div>
   );

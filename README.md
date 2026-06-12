@@ -7,7 +7,7 @@ A personal blog built with Next.js, featuring markdown and LaTeX support.
 ## Quick Start
 
 ```bash
-pnpm install && pnpm dev
+bun install && bun dev
 ```
 
 ## Blog Posts

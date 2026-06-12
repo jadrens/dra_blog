@@ -57,3 +57,21 @@ export function getAllPosts(locale: Locale): Post[] {
     };
   });
 }
+
+export interface AdjacentPosts {
+  prev: PostMeta | null;
+  next: PostMeta | null;
+}
+
+export function getAdjacentPosts(slug: string, locale: Locale): AdjacentPosts {
+  const index = getSearchIndex(locale);
+  const posts = index.postsByDate;
+  const idx = posts.findIndex((p) => p.slug === slug);
+  if (idx === -1) {
+    return { prev: null, next: null };
+  }
+  return {
+    prev: posts[idx - 1] ?? null,
+    next: posts[idx + 1] ?? null,
+  };
+}

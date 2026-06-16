@@ -142,7 +142,7 @@ bun --bun run build
 # 运行
 bun --bun run start -p 3000
 ```
-- 该应用默认运行在3000端口,或者修改```-p```来更改,不支持tls,请用nginx等反向代理工具代理
+- 该应用默认运行在3000端口,或者修改```-p```来更改,不支持tls,请用nginx等反向代理工具代理。可参考即用型配置 [`docs/nginx-example.conf`](nginx-example.conf)。
 
 ### 可选：使用 systemd 管理服务
 

@@ -146,7 +146,7 @@ bun --bun run build
 bun --bun run start -p 3000
 ```
 
-- The app runs on port 3000 by default. Change the `-p` value to use a different port. TLS is not supported — use a reverse proxy like Nginx.
+- The app runs on port 3000 by default. Change the `-p` value to use a different port. TLS is not supported — use a reverse proxy like Nginx. A ready-to-use example config is available at [`docs/nginx-example.conf`](docs/nginx-example.conf).
 
 ### Optional: Manage with systemd
 

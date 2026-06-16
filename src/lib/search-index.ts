@@ -9,6 +9,7 @@ const searchIndexDir = path.join(dataDir, "search-index");
 export interface PostMeta {
   slug: string;
   title: string;
+  description: string;
   date: string;
   tags: string[];
   locale: Locale;
@@ -48,15 +49,56 @@ function getContentMtime(locale: Locale): number {
   return latestMtime;
 }
 
+function writeMissingFrontmatter(
+  filePath: string,
+  content: string,
+  fields: Record<string, unknown>,
+): boolean {
+  try {
+    const parsed = matter(content);
+    Object.assign(parsed.data, fields);
+    const updated = matter.stringify(parsed.content, parsed.data);
+    fs.writeFileSync(filePath, updated);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function parsePostMeta(filePath: string, locale: Locale): PostMeta | null {
   try {
     const content = fs.readFileSync(filePath, "utf8");
     const { data } = matter(content);
     const slug = path.basename(filePath, ".md");
+    const title = data.title || "Untitled";
+
+    const missingFields: Record<string, unknown> = {};
+
+    let date: string;
+    if (data.date) {
+      date = new Date(data.date).toISOString();
+    } else {
+      date = new Date().toISOString();
+      missingFields.date = date;
+    }
+
+    let description: string;
+    if (data.description) {
+      description = data.description;
+    } else {
+      description = title;
+      missingFields.description = description;
+    }
+
+    if (Object.keys(missingFields).length > 0) {
+      writeMissingFrontmatter(filePath, content, missingFields);
+    }
+
     return {
       slug,
-      title: data.title || "Untitled",
-      date: data.date ? new Date(data.date).toISOString().split('T')[0] : "",
+      title,
+      description,
+      date,
       tags: data.tags || [],
       locale,
     };
@@ -122,6 +164,20 @@ function needsRegeneration(locale: Locale): boolean {
   const index = loadIndex(locale);
   if (!index) return true;
 
+  // Check for file additions/deletions by comparing slug sets
+  const contentDir = getContentDir(locale);
+  const diskFiles = fs.existsSync(contentDir)
+    ? fs.readdirSync(contentDir).filter((f) => f.endsWith(".md"))
+    : [];
+  const diskSlugs = new Set(diskFiles.map((f) => path.basename(f, ".md")));
+  const indexSlugs = new Set(index.postsByDate.map((p) => p.slug));
+
+  if (diskSlugs.size !== indexSlugs.size) return true;
+  for (const slug of diskSlugs) {
+    if (!indexSlugs.has(slug)) return true;
+  }
+
+  // Check for content modifications (mtime)
   const contentMtime = getContentMtime(locale);
   const indexMtime = fs.statSync(getIndexPath(locale)).mtimeMs;
 

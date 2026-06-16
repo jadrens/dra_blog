@@ -1,11 +1,12 @@
 {
   "version": 1,
-  "generatedAt": "2026-06-11T04:09:47.230Z",
+  "generatedAt": "2026-06-16T11:44:52.710Z",
   "postsByDate": [
     {
       "slug": "github-mirror",
       "title": "Set Up a GitHub Mirror Site",
-      "date": "2026-06-11",
+      "description": "Using Nginx to set up a GitHub mirror site for faster access",
+      "date": "2026-06-11T00:00:00.000Z",
       "tags": [
         "website",
         "mirror"
@@ -15,7 +16,8 @@
     {
       "slug": "markdown-test",
       "title": "Markdown Features Test",
-      "date": "2026-05-25",
+      "description": "A comprehensive test of all markdown features",
+      "date": "2026-05-25T00:00:00.000Z",
       "tags": [
         "Markdown",
         "Test"
@@ -28,7 +30,8 @@
       {
         "slug": "github-mirror",
         "title": "Set Up a GitHub Mirror Site",
-        "date": "2026-06-11",
+        "description": "Using Nginx to set up a GitHub mirror site for faster access",
+        "date": "2026-06-11T00:00:00.000Z",
         "tags": [
           "website",
           "mirror"
@@ -40,7 +43,8 @@
       {
         "slug": "github-mirror",
         "title": "Set Up a GitHub Mirror Site",
-        "date": "2026-06-11",
+        "description": "Using Nginx to set up a GitHub mirror site for faster access",
+        "date": "2026-06-11T00:00:00.000Z",
         "tags": [
           "website",
           "mirror"
@@ -52,7 +56,8 @@
       {
         "slug": "markdown-test",
         "title": "Markdown Features Test",
-        "date": "2026-05-25",
+        "description": "A comprehensive test of all markdown features",
+        "date": "2026-05-25T00:00:00.000Z",
         "tags": [
           "Markdown",
           "Test"
@@ -64,7 +69,8 @@
       {
         "slug": "markdown-test",
         "title": "Markdown Features Test",
-        "date": "2026-05-25",
+        "description": "A comprehensive test of all markdown features",
+        "date": "2026-05-25T00:00:00.000Z",
         "tags": [
           "Markdown",
           "Test"

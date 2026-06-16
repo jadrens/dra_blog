@@ -5,13 +5,10 @@ import path from "path";
 const dataDir = path.join(process.cwd(), "data");
 const dbPath = path.join(dataDir, "views.db");
 
-// 确保目录存在
 mkdirSync(dataDir, { recursive: true });
 
-// 打开或创建数据库
 const db = new Database(dbPath, { create: true });
 
-// 初始化表
 db.run(`
   CREATE TABLE IF NOT EXISTS views (
     slug TEXT PRIMARY KEY,

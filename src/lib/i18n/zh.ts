@@ -56,6 +56,10 @@ export const zh: TranslationKeys = {
     contents: "目录",
     noHeadings: "暂无标题",
   },
+  sidebar: {
+    toggle: "切换文章侧边栏",
+    allPosts: "所有文章",
+  },
   blogPage: {
     posts: "文章",
     noPosts: "暂无文章，请添加 markdown 文件到 content/posts/",
@@ -65,6 +69,7 @@ export const zh: TranslationKeys = {
     filterByTag: "按标签筛选",
     clearFilters: "清除筛选",
     done: "完成",
+    outline: "目录",
   },
   search: {
     title: "搜索",

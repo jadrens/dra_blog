@@ -16,6 +16,11 @@ import {
   Button,
   Tooltip,
   Popover,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Collapse,
 } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -24,9 +29,12 @@ import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import TocIcon from "@mui/icons-material/Toc";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { useI18n } from "@/lib/i18n";
 import { useTheme } from "@mui/material/styles";
 import { Locale } from "@/lib/posts";
+import { extractHeadings, Heading } from "@/components/reading/ReadingProgressContext";
 
 interface Post {
   slug: string;
@@ -64,6 +72,37 @@ const cardVariants = {
   exit: { opacity: 0, y: -20, scale: 0.95 },
 };
 
+interface TocPreviewItemProps {
+  heading: Heading;
+  locale: Locale;
+  slug: string;
+}
+
+function TocPreviewItem({ heading, locale, slug }: TocPreviewItemProps) {
+  return (
+    <>
+      <ListItem disablePadding>
+        <ListItemButton
+          component={Link}
+          href={`/blog/${locale}/${slug}#${heading.id}`}
+          sx={{ py: 0.5, pl: 1 + (heading.level - 1) * 1.5 }}
+        >
+          <ListItemText
+            primary={
+              <Typography variant={heading.level === 1 ? "body2" : "caption"} noWrap>
+                {heading.text}
+              </Typography>
+            }
+          />
+        </ListItemButton>
+      </ListItem>
+      {heading.children.map((child) => (
+        <TocPreviewItem key={child.id} heading={child} locale={locale} slug={slug} />
+      ))}
+    </>
+  );
+}
+
 export default function BlogContent({ posts, allViews, locale, allTags }: BlogContentProps) {
   const { t } = useI18n();
   const theme = useTheme();
@@ -72,6 +111,7 @@ export default function BlogContent({ posts, allViews, locale, allTags }: BlogCo
   const [sortDesc, setSortDesc] = useState(true);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagFilterAnchor, setTagFilterAnchor] = useState<HTMLElement | null>(null);
+  const [expandedTocSlug, setExpandedTocSlug] = useState<string | null>(null);
 
   const filteredPosts = useMemo(() => {
     let result = [...posts];
@@ -184,10 +224,10 @@ export default function BlogContent({ posts, allViews, locale, allTags }: BlogCo
                 layout
                 transition={{ duration: 0.25, ease: "easeOut" }}
               >
-                <Link href={`/blog/${locale}/${post.slug}`} style={{ textDecoration: "none" }}>
-                  <Card sx={{ transition: "box-shadow 0.2s", "&:hover": { boxShadow: `0 0 15px ${alpha(theme.palette.primary.main, 0.5)}` } }}>
+                <Card sx={{ position: "relative", transition: "box-shadow 0.2s", "&:hover": { boxShadow: `0 0 15px ${alpha(theme.palette.primary.main, 0.5)}` } }}>
+                  <Link href={`/blog/${locale}/${post.slug}`} style={{ textDecoration: "none", display: "block" }}>
                     <CardContent>
-                      <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: "medium" }}>
+                      <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: "medium", pr: 5 }}>
                         {highlightText(post.title, searchKeyword)}
                       </Typography>
                       <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap", mb: 1 }}>
@@ -203,12 +243,45 @@ export default function BlogContent({ posts, allViews, locale, allTags }: BlogCo
                         ))}
                       </Box>
                       <Box sx={{ display: "flex", gap: 3, alignItems: "center", flexWrap: "wrap" }}>
-                        <Chip icon={<CalendarTodayIcon />} label={post.date} size="small" variant="outlined" />
+                        <Chip icon={<CalendarTodayIcon />} label={post.date.split('T')[0]} size="small" variant="outlined" />
                         <Chip icon={<VisibilityIcon />} label={`${allViews[post.slug] || 0} ${t.blog.views}`} size="small" variant="outlined" />
                       </Box>
                     </CardContent>
-                  </Card>
-                </Link>
+                  </Link>
+                  <Collapse in={expandedTocSlug === post.slug} timeout="auto" unmountOnExit>
+                    <Box sx={{ px: 2, pb: 2, borderTop: 1, borderColor: "divider" }}>
+                      <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, mt: 2 }}>
+                        {t.blogPage.outline}
+                      </Typography>
+                      {extractHeadings(post.content).length === 0 ? (
+                        <Typography variant="body2" color="text.secondary">
+                          {t.toc.noHeadings}
+                        </Typography>
+                      ) : (
+                        <List dense disablePadding>
+                          {extractHeadings(post.content).map((heading) => (
+                            <TocPreviewItem key={heading.id} heading={heading} locale={locale} slug={post.slug} />
+                          ))}
+                        </List>
+                      )}
+                    </Box>
+                  </Collapse>
+                  <Tooltip title={t.blogPage.outline}>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setExpandedTocSlug((prev) => (prev === post.slug ? null : post.slug));
+                      }}
+                      sx={{ position: "absolute", top: 12, right: 12 }}
+                      aria-label={t.blogPage.outline}
+                      aria-expanded={expandedTocSlug === post.slug}
+                    >
+                      {expandedTocSlug === post.slug ? <ExpandLessIcon /> : <TocIcon />}
+                    </IconButton>
+                  </Tooltip>
+                </Card>
               </motion.div>
             ))}
           </AnimatePresence>

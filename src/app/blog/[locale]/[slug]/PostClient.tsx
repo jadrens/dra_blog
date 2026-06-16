@@ -14,10 +14,12 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import TableOfContents from "@/components/toc/TableOfContents";
 import TableOfContentsDrawer from "@/components/toc/TableOfContentsDrawer";
 import FloatingTOCButton from "@/components/toc/FloatingTOCButton";
+import PostsSidebar from "@/components/sidebar/PostsSidebar";
 import ReadingProgressBar from "@/components/reading/ReadingProgressBar";
 import BackToTopButton from "@/components/reading/BackToTopButton";
 import { ReadingProgressProvider } from "@/components/reading/ReadingProgressContext";
 import { useScrollProgress } from "@/hooks/useScrollProgress";
+import { useBrowserConfig, BrowserConfigKeys } from "@/hooks/useBrowserConfig";
 import { useI18n } from "@/lib/i18n";
 import { Locale } from "@/lib/posts";
 import { PostMeta } from "@/lib/search-index";
@@ -35,6 +37,7 @@ interface PostClientProps {
   slug: string;
   incrementView: (slug: string) => Promise<void>;
   locale: Locale;
+  allPosts: PostMeta[];
   title: React.ReactNode;
   md_content: React.ReactNode;
   prev: PostMeta | null;
@@ -92,10 +95,11 @@ function getRelativeTime(dateStr: string, t: any): string {
   return `${s(seconds, ta.second, ta.seconds)}`;
 }
 
-function PostContent({ post, views, slug, incrementView, locale, title, md_content, prev, next }: PostClientProps) {
+function PostContent({ post, views, slug, incrementView, locale, allPosts, title, md_content, prev, next }: PostClientProps) {
   const { t } = useI18n();
   const theme = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useBrowserConfig(BrowserConfigKeys.sidebarOpen, true);
   const [localViews, setLocalViews] = useState(views);
   const [mounted, setMounted] = useState(false);
 
@@ -118,9 +122,19 @@ function PostContent({ post, views, slug, incrementView, locale, title, md_conte
       <FloatingTOCButton onClick={() => setDrawerOpen(true)} />
       <ReadingProgressBar />
       <BackToTopButton />
-      <Box sx={{ display: { xs: "block", sm: "grid" }, gridTemplateColumns: { sm: "250px 1fr" }, gap: 4 }}>
-        <TableOfContents />
-        <Box component="main" sx={{ width: '100%', pr: { sm: '250px' }, pl: { sm: '76px', xs: 3 }, py: 8 }}>
+
+      <Box sx={{ display: { xs: "block", sm: "grid" }, gridTemplateColumns: { sm: sidebarOpen ? "250px 1fr 250px" : "1fr 250px" }, gap: 4, pr: { sm: 3 }, transition: "grid-template-columns 0.3s ease" }}>
+        {/* Posts sidebar — open state in left grid column */}
+        {sidebarOpen && (
+          <PostsSidebar
+            open
+            onToggle={() => setSidebarOpen(false)}
+            posts={allPosts}
+            currentSlug={slug}
+            locale={locale}
+          />
+        )}
+        <Box component="main" sx={{ width: '100%', pl: { sm: '76px', xs: 3 }, pr: { xs: 3, sm: 0 }, py: 8 }}>
           <Breadcrumbs sx={{ mb: 2, animation: 'fadeIn 0.5s ease-out', animationDelay: '0.1s', animationFillMode: 'both' }}>
             <Link
               href={`/blog/${locale}`}
@@ -163,7 +177,7 @@ function PostContent({ post, views, slug, incrementView, locale, title, md_conte
                   <Tooltip title={getRelativeTime(post.date, t) + ` ${t.blog.timeAgo.ago}`} arrow>
                     <Chip
                       icon={<EventIcon />}
-                      label={post.date}
+                      label={post.date.split('T')[0]}
                       size="small"
                       variant="outlined"
                       sx={{
@@ -296,7 +310,20 @@ function PostContent({ post, views, slug, incrementView, locale, title, md_conte
             </Box>
           </article>
         </Box>
+        <TableOfContents />
       </Box>
+
+      {/* Posts sidebar toggle — closed state, outside grid */}
+      {!sidebarOpen && (
+        <PostsSidebar
+          open={false}
+          onToggle={() => setSidebarOpen(true)}
+          posts={allPosts}
+          currentSlug={slug}
+          locale={locale}
+        />
+      )}
+
       <style>{`
         @keyframes slideUp {
           from { opacity: 0; transform: translateY(20px); }
@@ -311,10 +338,10 @@ function PostContent({ post, views, slug, incrementView, locale, title, md_conte
   );
 }
 
-export default function PostClient({ post, views, slug, incrementView, locale, title, md_content, prev, next }: PostClientProps) {
+export default function PostClient({ post, views, slug, incrementView, locale, allPosts, title, md_content, prev, next }: PostClientProps) {
   return (
     <ReadingProgressProvider>
-      <PostContent post={post} views={views} slug={slug} incrementView={incrementView} locale={locale} title={title} md_content={md_content} prev={prev} next={next} />
+      <PostContent post={post} views={views} slug={slug} incrementView={incrementView} locale={locale} allPosts={allPosts} title={title} md_content={md_content} prev={prev} next={next} />
     </ReadingProgressProvider>
   );
 }

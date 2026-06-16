@@ -30,24 +30,11 @@ export function getPostBySlug(slug: string, locale: Locale): Post {
 
   const postsDirectory = getPostsDirectory(locale);
   const fullPath = path.join(postsDirectory, `${slug}.md`);
-  const fileContents = fs.readFileSync(fullPath, "utf8");
-  const { content } = matter(fileContents);
 
-  return {
-    slug: meta.slug,
-    title: meta.title,
-    date: meta.date,
-    content,
-    tags: meta.tags,
-  };
-}
-
-export function getAllPosts(locale: Locale): Post[] {
-  const index = getSearchIndex(locale);
-  return index.postsByDate.map((meta: PostMeta) => {
-    const fullPath = path.join(getPostsDirectory(locale), `${meta.slug}.md`);
+  try {
     const fileContents = fs.readFileSync(fullPath, "utf8");
     const { content } = matter(fileContents);
+
     return {
       slug: meta.slug,
       title: meta.title,
@@ -55,7 +42,32 @@ export function getAllPosts(locale: Locale): Post[] {
       content,
       tags: meta.tags,
     };
-  });
+  } catch {
+    return { slug, title: "Not Found", date: "", content: "", tags: [] };
+  }
+}
+
+export function getAllPosts(locale: Locale): Post[] {
+  const index = getSearchIndex(locale);
+  const posts: Post[] = [];
+  for (const meta of index.postsByDate) {
+    const fullPath = path.join(getPostsDirectory(locale), `${meta.slug}.md`);
+    try {
+      const fileContents = fs.readFileSync(fullPath, "utf8");
+      const { content } = matter(fileContents);
+      posts.push({
+        slug: meta.slug,
+        title: meta.title,
+        date: meta.date,
+        content,
+        tags: meta.tags,
+      });
+    } catch {
+      // File was deleted or unreadable — skip it (index will be regenerated)
+      continue;
+    }
+  }
+  return posts;
 }
 
 export interface AdjacentPosts {

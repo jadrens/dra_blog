@@ -54,6 +54,10 @@ export const en = {
     contents: "Contents",
     noHeadings: "No headings found",
   },
+  sidebar: {
+    toggle: "Toggle posts sidebar",
+    allPosts: "All Posts",
+  },
   blogPage: {
     posts: "Posts",
     noPosts: "No posts yet. Add markdown files to content/posts/",
@@ -63,6 +67,7 @@ export const en = {
     filterByTag: "Filter by tag",
     clearFilters: "Clear filters",
     done: "Done",
+    outline: "Outline",
   },
   search: {
     title: "Search",

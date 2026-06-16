@@ -1,8 +1,10 @@
 ---
 title: Markdown 功能测试
-date: 2026-05-25T00:00:00.000Z
 description: 全面测试所有 markdown 功能
-tags: [Markdown, 测试]
+tags:
+  - Markdown
+  - 测试
+date: '2026-06-16T11:45:48.864Z'
 ---
 
 ## 1. 标题测试

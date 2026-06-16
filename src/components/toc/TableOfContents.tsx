@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Box, List, ListItem, ListItemButton, ListItemText, Collapse, Typography, Tooltip } from "@mui/material";
+import { Box, List, ListItem, ListItemButton, ListItemText, Collapse, Typography, Tooltip, alpha } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { useReadingProgress, Heading } from "../reading/ReadingProgressContext";
@@ -49,6 +49,7 @@ function TocItem({ heading, expandedIds, onToggle }: TocItemProps) {
     <>
       <ListItem disablePadding disableGutters>
         <ListItemButton
+          data-heading-id={heading.id}
           onClick={handleClick}
           sx={{
             py: 0.5,
@@ -98,7 +99,7 @@ function TocItem({ heading, expandedIds, onToggle }: TocItemProps) {
 }
 
 export default function TableOfContents() {
-  const { headings } = useReadingProgress();
+  const { headings, activeHeadingId } = useReadingProgress();
   const { t } = useI18n();
   const [navVisible, setNavVisible] = useState(true);
   const [loaded, setLoaded] = useState(false);
@@ -129,11 +130,11 @@ export default function TableOfContents() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Auto-expand: greedily expand from top until overflow
+  // Auto-expand: greedily expand from top until overflow (fixed 55vh block)
   useEffect(() => {
     if (headings.length === 0) return;
 
-    const maxHeight = navVisible ? window.innerHeight - 100 : window.innerHeight - 32;
+    const maxHeight = window.innerHeight * 0.55 - 60;
     const availableItems = Math.floor(maxHeight / ITEM_HEIGHT);
 
     const tryExpanded = new Set<string>();
@@ -157,7 +158,23 @@ export default function TableOfContents() {
 
     tryAdd(headings);
     setExpandedIds(tryExpanded);
-  }, [headings, navVisible]);
+  }, [headings]);
+
+  // Auto-scroll to keep active heading visible inside the TOC float
+  useEffect(() => {
+    if (!activeHeadingId || !listRef.current) return;
+
+    // Wait a tick for Collapse transitions to settle
+    const raf = requestAnimationFrame(() => {
+      const activeEl = listRef.current?.querySelector(
+        `[data-heading-id="${CSS.escape(activeHeadingId)}"]`
+      );
+      if (activeEl) {
+        activeEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      }
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [activeHeadingId]);
 
   const handleToggle = useCallback((id: string) => {
     setExpandedIds((prev) => {
@@ -171,33 +188,70 @@ export default function TableOfContents() {
     });
   }, []);
 
-  if (headings.length === 0) return null;
+  if (headings.length === 0) {
+    return (
+      <Box
+        sx={(theme) => ({
+          width: tocDesktopWidth,
+          flexShrink: 0,
+          position: "sticky",
+          top: 80,
+          pl: 2,
+          pr: 2,
+          pt: 1.5,
+          pb: 2,
+          mx: 2,
+          bgcolor: alpha(theme.palette.background.paper, 0.75),
+          backdropFilter: 'blur(16px)',
+          borderRadius: 5,
+          border: 1,
+          borderColor: 'divider',
+          boxShadow: theme.shadows[4],
+          display: { xs: "none", sm: "block" },
+        })}
+      >
+        <Typography
+          variant="overline"
+          sx={{ px: 1, color: "text.secondary", fontWeight: 600 }}
+        >
+          {t.toc.contents}
+        </Typography>
+        <Box sx={{ px: 1, py: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            {t.toc.noHeadings}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box
       ref={listRef}
-      sx={{
+      sx={(theme) => ({
         width: tocDesktopWidth,
         flexShrink: 0,
         position: "sticky",
-        top: navVisible ? 64 : 0,
-        maxHeight: navVisible ? "calc(100vh - 64px)" : "calc(100vh)",
+        top: navVisible ? 80 : 16,
+        maxHeight: "55vh",
         overflowY: "auto",
         pl: 2,
         pr: 2,
-        pt: 1,
+        pt: 1.5,
         pb: 2,
-        mr: 1,
+        mx: 2,
         zIndex: 1,
-        borderRight: 1,
-        borderColor: "divider",
-        bgcolor: "background.paper",
-        borderRadius: 1,
+        bgcolor: alpha(theme.palette.background.paper, 0.75),
+        backdropFilter: 'blur(16px)',
+        borderRadius: 5,
+        border: 1,
+        borderColor: 'divider',
+        boxShadow: theme.shadows[4],
         display: { xs: "none", sm: "block" },
-        transform: loaded ? "translateX(0)" : "translateX(-20px)",
+        transform: loaded ? "translateX(0)" : "translateX(20px)",
         opacity: loaded ? 1 : 0,
-        transition: "top 0.2s, max-height 0.2s, padding-top 0.2s, transform 0.3s ease-out, opacity 0.3s ease-out",
-      }}
+        transition: "top 0.2s, transform 0.3s ease-out, opacity 0.3s ease-out",
+      })}
     >
       <Typography
         variant="overline"

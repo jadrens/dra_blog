@@ -1,5 +1,6 @@
 import Navbar from "@/components/layout/Navbar";
 import { getPostBySlug, getAdjacentPosts, Locale } from "@/lib/posts";
+import { getSearchIndex } from "@/lib/search-index";
 import { getPostView, incrementView } from "../../actions";
 import PostClient from "./PostClient";
 import { Metadata } from "next";
@@ -28,6 +29,7 @@ export default async function PostPage({ params }: Props) {
     getPostView(slug),
     getAdjacentPosts(slug, locale),
   ]);
+  const allPosts = getSearchIndex(locale).postsByDate;
   const wordCount = post.content.replace(/\s/g, "").length;
   const date = post.date;
   const client_post = {
@@ -42,6 +44,7 @@ export default async function PostPage({ params }: Props) {
     <div className="min-h-screen flex flex-col" suppressHydrationWarning>
       <Navbar />
       <PostClient post={client_post} views={views} slug={slug} incrementView={incrementView} locale={locale}
+        allPosts={allPosts}
         title={<Typography color="text.primary" className="text-sm">
               {post.title}
             </Typography>}

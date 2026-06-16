@@ -9,7 +9,6 @@ import rehypeRaw from "rehype-raw";
 import { Box, Paper } from "@mui/material";
 import CodeBlock from "./CodeBlock";
 import { useEffect, useRef, useCallback } from "react";
-import { usePathname } from "next/navigation";
 import TagIcon from "@mui/icons-material/Tag";
 import { useReadingProgress, slugify } from "../reading/ReadingProgressContext";
 import React from "react";
@@ -99,15 +98,14 @@ function HeadingWithAnchor({
 }
 
 export default function MarkdownContent({ content }: MarkdownContentProps) {
-  const pathname = usePathname();
-  const { setHeadings, setActiveHeadingId } = useReadingProgress();
+  const { headings, setHeadings, setActiveHeadingId } = useReadingProgress();
   const contentRef = useRef<HTMLDivElement>(null);
 
   const updateActiveHeading = useCallback(() => {
     if (!contentRef.current) return;
 
-    const headings = contentRef.current.querySelectorAll("h1, h2, h3");
-    if (headings.length === 0) return;
+    const headingEls = contentRef.current.querySelectorAll("h1, h2, h3");
+    if (headingEls.length === 0) return;
 
     const scrollY = window.scrollY;
     const viewportHeight = window.innerHeight;
@@ -116,7 +114,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
     let activeId: string | null = null;
     let lastTop = -Infinity;
 
-    headings.forEach((heading) => {
+    headingEls.forEach((heading) => {
       const rect = heading.getBoundingClientRect();
       const absoluteTop = rect.top + scrollY;
 
@@ -133,7 +131,10 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
 
   useEffect(() => {
     window.addEventListener("scroll", updateActiveHeading, { passive: true });
-    updateActiveHeading();
+    // Skip on mount if there's a hash fragment — let the fragment scroll effect go first
+    if (!window.location.hash) {
+      updateActiveHeading();
+    }
 
     return () => {
       window.removeEventListener("scroll", updateActiveHeading);
@@ -141,16 +142,28 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
   }, [updateActiveHeading]);
 
   useEffect(() => {
-    if (window.location.hash) {
-      const id = window.location.hash.slice(1);
-      const element = document.getElementById(id);
+    const hash = window.location.hash;
+    if (!hash || headings.length === 0) return;
+
+    const targetId = decodeURIComponent(hash.slice(1));
+    const flatten = (hs: typeof headings): typeof headings =>
+      hs.flatMap((h) => [h, ...flatten(h.children)]);
+    const match = flatten(headings).find((h) => h.id === targetId);
+    if (!match) return;
+
+    let attempts = 0;
+    const maxAttempts = 10;
+    const tryScroll = () => {
+      const element = document.getElementById(match.id);
       if (element) {
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 100);
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (attempts < maxAttempts) {
+        attempts++;
+        requestAnimationFrame(tryScroll);
       }
-    }
-  }, [pathname]);
+    };
+    requestAnimationFrame(tryScroll);
+  }, [headings]);
 
   useEffect(() => {
     const headingRegex = /^(#{1,3})\s+(.+)$/gm;

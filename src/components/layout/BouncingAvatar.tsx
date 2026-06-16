@@ -122,30 +122,66 @@ export default function BouncingAvatar() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const body = avatar;
-      const x = body.position.x;
-      const y = body.position.y;
+      let x = body.position.x;
+      let y = body.position.y;
 
+      // Safety: clamp ball back into viewport if it escapes (tunneling / resize)
+      const margin = radius;
+      let clamped = false;
+      let newVx = body.velocity.x;
+      let newVy = body.velocity.y;
+
+      if (x < -margin) {
+        x = -margin;
+        newVx = Math.abs(newVx);
+        clamped = true;
+      } else if (x > canvas.width + margin) {
+        x = canvas.width + margin;
+        newVx = -Math.abs(newVx);
+        clamped = true;
+      }
+
+      if (y < -margin) {
+        y = -margin;
+        newVy = Math.abs(newVy);
+        clamped = true;
+      } else if (y > canvas.height + margin) {
+        y = canvas.height + margin;
+        newVy = -Math.abs(newVy);
+        clamped = true;
+      }
+
+      if (clamped) {
+        Body.setPosition(body, { x, y });
+        Body.setVelocity(body, { x: newVx, y: newVy });
+      }
+
+      // Shadow (screen-space, does not rotate with ball)
       ctx.save();
-
-      // Shadow
       ctx.beginPath();
       ctx.arc(x + 3, y + 3, radius, 0, Math.PI * 2);
       ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
       ctx.fill();
+      ctx.restore();
+
+      // Ball + avatar image (rotated by body.angle)
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(body.angle);
 
       // Circle background
       ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
       ctx.fillStyle = "#fff";
       ctx.fill();
 
       // Avatar image clipped to circle
       ctx.beginPath();
-      ctx.arc(x, y, radius - 1, 0, Math.PI * 2);
+      ctx.arc(0, 0, radius - 1, 0, Math.PI * 2);
       ctx.clip();
 
       if (avatarImg.complete) {
-        ctx.drawImage(avatarImg, x - radius + 1, y - radius + 1, (radius - 1) * 2, (radius - 1) * 2);
+        ctx.drawImage(avatarImg, -radius + 1, -radius + 1, (radius - 1) * 2, (radius - 1) * 2);
       }
 
       ctx.restore();

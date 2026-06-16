@@ -51,7 +51,7 @@ Changes will be merged into the `run` branch and deployed to the server.
 git clone https://github.com/jadrens/dra_blog.git
 ```
 
-> If you have trouble connecting to GitHub from mainland China, you can use the mirror site I set up (github.rayou.me — **do NOT log in** for your account's safety). See [Setting up a GitHub Mirror](https://blog.rayou.me/blog/zh/github-mirror) for details.<br>
+> If you have trouble connecting to GitHub from mainland China, you can use the mirror site I set up (github.rayou.me — **do NOT log in** for your account's safety). See [Setting up a GitHub Mirror](https://blog.rayou.me/blog/en/github-mirror) for details.<br>
 > Use: `git clone https://github.rayou.me/jadrens/dra_blog.git`
 
 ```shell

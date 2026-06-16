@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 import { getAllPosts, Locale } from "@/lib/posts";
-import { SITE_CONFIG } from "@/lib/config";
+import { SITE_CONFIG } from "@/var/config";
 
 const locales: Locale[] = ["en", "zh"];
 

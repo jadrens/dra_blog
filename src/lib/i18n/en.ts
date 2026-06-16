@@ -32,16 +32,6 @@ export const en = {
   theme: {
     toggle: "Toggle theme",
   },
-  about: {
-    title: "About",
-    description: "This is my blog.",
-    email: "jaden@jadren.moe",
-    github: "jadrens",
-    youtube: "dragonren",
-    bilibili: "dragonren",
-    telegram: "dragonren",
-    socials: "Socials",
-  },
   home: {
     title: "dragonren",
     description: "Welcome to my blog",

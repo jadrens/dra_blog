@@ -34,16 +34,6 @@ export const zh: TranslationKeys = {
   theme: {
     toggle: "切换主题",
   },
-  about: {
-    title: "关于",
-    description: "这是我的博客。",
-    email: "jaden@jadren.moe",
-    github: "jadrens",
-    youtube: "dragonren",
-    bilibili: "dragonren",
-    telegram: "dragonren",
-    socials: "社交媒体",
-  },
   home: {
     title: "dragonren",
     description: "欢迎来到我的博客",

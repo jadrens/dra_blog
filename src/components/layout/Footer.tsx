@@ -4,11 +4,11 @@ import { Box, Typography, Chip, Avatar } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import LinkIcon from "@mui/icons-material/Link";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import { useI18n } from "@/lib/i18n";
 import BouncingAvatar from "./BouncingAvatar";
+import { SITE_CONFIG } from "@/var/config";
+import { CONTACT_CONFIG } from "@/var/contact";
 
 export default function Footer() {
-  const { t } = useI18n();
   const year = new Date().getFullYear();
 
   return (
@@ -42,16 +42,18 @@ export default function Footer() {
           &copy; {year} dragonren
         </Typography>
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", justifyContent: "center" }}>
-          <Chip
-            icon={<EmailIcon sx={{ fontSize: 14 }} />}
-            label={t.about.email}
-            component="a"
-            href={`mailto:${t.about.email}`}
-            clickable
-            size="small"
-            variant="outlined"
-            sx={{ p: 1.5 }}
-          />
+          {CONTACT_CONFIG.email.enabled && (
+            <Chip
+              icon={<EmailIcon sx={{ fontSize: 14 }} />}
+              label={CONTACT_CONFIG.email.address}
+              component="a"
+              href={`mailto:${CONTACT_CONFIG.email.address}`}
+              clickable
+              size="small"
+              variant="outlined"
+              sx={{ p: 1.5 }}
+            />
+          )}
           {/* <Chip
             icon={<LinkIcon sx={{ fontSize: 14 }} />}
             label={t.footer.beian}
@@ -64,18 +66,20 @@ export default function Footer() {
             rel="noopener"
             sx={{ p: 1.5 }}
           /> */}
-          <Chip
-            icon={<GitHubIcon sx={{ fontSize: 14 }} />}
-            label="GitHub"
-            component="a"
-            href="https://github.com/jadrens/drablog"
-            clickable
+          {SITE_CONFIG.githubClipEnabled && (
+            <Chip
+              icon={<GitHubIcon sx={{ fontSize: 14 }} />}
+              label="GitHub"
+              component="a"
+              href={SITE_CONFIG.githubRepo}
+              clickable
             size="small"
             variant="outlined"
             target="_blank"
             rel="noopener"
             sx={{ p: 1.5 }}
           />
+          )}
         </Box>
       </Box>
     </Box>

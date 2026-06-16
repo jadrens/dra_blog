@@ -23,7 +23,7 @@ import { useBrowserConfig, BrowserConfigKeys } from "@/hooks/useBrowserConfig";
 import { useI18n } from "@/lib/i18n";
 import { Locale } from "@/lib/posts";
 import { PostMeta } from "@/lib/search-index";
-import { SITE_CONFIG } from "@/lib/config";
+import { SITE_CONFIG } from "@/var/config";
 
 interface PostClientProps {
   post: {
@@ -293,20 +293,22 @@ function PostContent({ post, views, slug, incrementView, locale, allPosts, title
               </Box>
             )}
             <Box sx={{ mt: 4, pt: 2, borderTop: 1, borderColor: 'divider' }}>
-              <Chip
-                component="a"
-                href={`${SITE_CONFIG.githubRepo}/edit/${SITE_CONFIG.githubBranch}/content/posts/${locale}/${post.slug}.md`}
-                target="_blank"
-                rel="noopener noreferrer"
-                icon={<EditIcon />}
-                label={t.blog.editOnGithub}
-                variant="outlined"
-                size="small"
-                clickable
-                sx={{ '& .MuiChip-icon': { ml: 1 }, '& .MuiChip-label': { pr: 1.5 } }}
-                deleteIcon={<ArrowForwardIcon />}
-                onDelete={() => {}}
-              />
+              {SITE_CONFIG.githubEditEnabled && (
+                <Chip
+                  component="a"
+                  href={`${SITE_CONFIG.githubRepo}/edit/${SITE_CONFIG.githubBranch}/content/posts/${locale}/${post.slug}.md`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  icon={<EditIcon />}
+                  label={t.blog.editOnGithub}
+                  variant="outlined"
+                  size="small"
+                  clickable
+                  sx={{ '& .MuiChip-icon': { ml: 1 }, '& .MuiChip-label': { pr: 1.5 } }}
+                  deleteIcon={<ArrowForwardIcon />}
+                  onDelete={() => {}}
+                />
+              )}
             </Box>
           </article>
         </Box>

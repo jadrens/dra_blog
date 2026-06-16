@@ -45,9 +45,9 @@ export default function Footer() {
           {CONTACT_CONFIG.email.enabled && (
             <Chip
               icon={<EmailIcon sx={{ fontSize: 14 }} />}
-              label={CONTACT_CONFIG.email.address}
+              label={CONTACT_CONFIG.email.url}
               component="a"
-              href={`mailto:${CONTACT_CONFIG.email.address}`}
+              href={`mailto:${CONTACT_CONFIG.email.url}`}
               clickable
               size="small"
               variant="outlined"

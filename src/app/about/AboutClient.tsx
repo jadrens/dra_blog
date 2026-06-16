@@ -1,49 +1,15 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import MarkdownContent from "@/components/content/MarkdownContent";
 import { ReadingProgressProvider } from "@/components/reading/ReadingProgressContext";
-import { Box, Paper, Avatar, Link as MuiLink, useTheme } from "@mui/material";
-import EmailIcon from "@mui/icons-material/Email";
-import GitHubIcon from "@mui/icons-material/GitHub";
+import { Box, Paper, Avatar, Link as MuiLink, useTheme, Snackbar, Alert } from "@mui/material";
 import { useI18n } from "@/lib/i18n";
 import { alpha } from "@mui/material";
-import { CONTACT_CONFIG } from "@/var/contact";
-
-const YouTubeIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-  </svg>
-);
-
-const BilibiliIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17.813 4.653h.854c1.51.054 2.769.578 3.186 1.34.18.336.244.73.126 1.172-.086.31-.282.5-.525.66-.25.168-.62.267-.994.332v1.215c.31-.01.56-.055.748-.134.187-.08.36-.18.517-.3.05-.036.112-.06.184-.075l.57-.042c.157-.012.273.013.35.075.077.062.13.18.16.356h1.187c-.055-.32-.12-.57-.195-.748a2.387 2.387 0 0 0-.296-.54 1.407 1.407 0 0 0-.406-.37c-.16-.1-.33-.185-.51-.256-.18-.07-.36-.12-.54-.15a3.91 3.91 0 0 0-.497-.05c-.078 0-.168.008-.27.026-.102.017-.187.026-.255.026H8.615l-.96 1.128-.96-1.128H2.436c-.084 0-.174-.008-.27-.026-.096-.018-.18-.027-.255-.027-.16 0-.33.016-.512.05a2.953 2.953 0 0 0-.539.15 2.443 2.443 0 0 0-.493.255 1.352 1.352 0 0 0-.37.37c-.098.154-.19.337-.278.55-.088.212-.154.455-.2.728h1.17c.03-.177.083-.3.16-.36a.548.548 0 0 1 .35-.075l.56.042c.072.015.134.04.185.076.157.12.33.22.516.3.188.08.44.124.748.134v-1.215c-.374-.065-.744-.164-.994-.332-.243-.16-.44-.35-.526-.66-.117-.442-.053-.836.127-1.172.416-.762 1.675-1.286 3.186-1.34h.855l1.81 2.138 2.08-2.138zM5.173 10.32c-.16-.046-.33-.065-.51-.058-.18.007-.35.04-.51.098v3.635c.15.047.33.068.51.064.18-.004.35-.036.51-.095.16-.06.3-.144.42-.254.12-.11.22-.245.3-.406.08-.16.13-.337.15-.53h1.154c-.03.38-.13.712-.3.995-.17.284-.39.52-.66.71-.27.188-.57.325-.9.41-.33.086-.68.128-1.05.128-.37 0-.72-.042-1.05-.128-.33-.085-.63-.222-.9-.41-.27-.19-.49-.426-.66-.71-.17-.283-.27-.615-.3-.995h1.154c.02.193.07.37.15.53.08.161.18.296.3.406.12.11.26.194.42.254.16.06.33.09.51.095.18.004.36-.017.51-.064V10.36c-.16-.058-.33-.09-.51-.098-.18-.008-.35.012-.51.058-.16.046-.3.12-.42.222-.12.102-.22.23-.3.384-.08.155-.13.33-.15.527H3.473c.04-.47.17-.88.39-1.23.22-.35.51-.63.87-.84.36-.21.76-.355 1.2-.436.44-.08.89-.12 1.35-.12.46 0 .91.04 1.35.12.44.08.84.226 1.2.436.36.21.65.49.87.84.22.35.35.76.39 1.23H5.673c-.02-.196-.07-.372-.15-.526a1.31 1.31 0 0 0-.3-.385 1.055 1.055 0 0 0-.42-.222zM12.007 12.8c-.09-.19-.19-.35-.3-.48a1.487 1.487 0 0 0-.42-.31 1.126 1.126 0 0 0-.51-.12c-.18 0-.34.04-.51.12-.15.08-.28.19-.39.31-.11.13-.2.29-.27.48-.07.19-.11.4-.13.63H9.067c.02-.54.16-1 .42-1.37.26-.38.62-.66 1.07-.87.46-.2.98-.31 1.57-.31.59 0 1.11.11 1.57.31.46.21.82.49 1.07.87.26.37.4.83.42 1.37h-1.33c-.02-.23-.06-.44-.13-.63zm7.706-1.96c-.02.06-.04.11-.06.16-.02.05-.04.1-.06.16h-1.21c0-.1.02-.18.06-.24s.08-.13.13-.19c.05-.06.11-.11.17-.16l.19-.11c.07-.04.15-.07.23-.09.08-.02.16-.04.24-.04.07 0 .14.01.22.03.08.02.14.04.19.07.05.03.09.06.12.09.03.03.05.07.06.11l.84.84-.9.9-.84-.84c-.04-.04-.09-.07-.15-.09a.49.49 0 0 0-.18-.03c-.06 0-.12.01-.19.03-.06.02-.13.05-.19.09l-.18.11-.18.16c-.05.06-.1.12-.13.19-.03.06-.05.14-.06.24h1.21c.02-.05.04-.11.06-.16s.04-.1.06-.16h.66z"/>
-  </svg>
-);
-
-const TelegramIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.654.888 1.772.32.666.645 1.306.953 1.908.17.335.246.535.304.566.058.03.153.032.253 0 .1-.032.642-.484.912-1.052.268-.563.475-1.075.65-1.448.178-.383.178-.816.026-1.158-.15-.342-.452-.506-.795-.506zm4.96-1.63c-.1.006-.293.657-.803 1.792-.65 1.5-.943 2.2-1.106 2.32-.163.12-.35.144-.507.047-.157-.097-.617-.45-1.22-.86-.61-.41-1.058-.62-1.196-.62-.138 0-.276.03-.416.09-.14.06-.29.144-.447.25-.156.108-.28.22-.37.336-.09.117-.17.22-.242.31l-1.11 1.12c-.3.302-.562.567-.788.796-.227.23-.44.418-.64.568-.2.15-.385.255-.555.316-.17.06-.333.09-.49.09-.157 0-.295-.02-.415-.06-.12-.04-.246-.1-.378-.18-.134-.08-.3-.18-.5-.3-.2-.12-.466-.27-.8-.45-.335-.18-.633-.34-.896-.48-.264-.14-.475-.25-.635-.33-.16-.08-.28-.13-.36-.15-.08-.02-.137-.03-.17-.03-.035 0-.078.002-.13.005-.05.003-.138.012-.262.025l-.15.016-.148.016-.013.003c-.1.003-.196.005-.287.005H8.5c-.093 0-.184-.002-.274-.005l-.26-.025-.24-.025c-.115-.025-.178-.038-.19-.038-.08 0-.194.026-.342.08-.148.052-.33.133-.545.24-.216.11-.477.253-.786.43-.31.18-.64.377-.99.59l-.12.075-.09.058c-.23.15-.453.306-.67.47-.218.164-.42.314-.607.45-.188.136-.352.24-.493.31-.14.07-.25.113-.33.13l-.14.03c-.056.01-.1.015-.13.015-.03 0-.05-.003-.07-.01-.02-.006-.04-.014-.05-.025-.01-.01-.02-.02-.03-.03-.01-.01-.01-.02-.01-.03-.01-.02-.01-.03-.01-.04v-.09l.01-.09c.01-.03.02-.07.03-.12.01-.05.03-.11.06-.19.03-.07.07-.16.13-.27.06-.11.14-.25.25-.43.11-.18.25-.4.43-.67.18-.27.4-.58.66-.93.26-.35.53-.72.82-1.11l.08-.11c.18-.25.376-.514.588-.792.213-.277.427-.538.644-.783.216-.245.414-.453.592-.624.18-.17.324-.3.433-.387.11-.087.17-.13.17-.13s-.096-.1-.29-.248c-.193-.147-.478-.337-.854-.57-.377-.232-.82-.483-1.33-.752-.51-.27-1.08-.51-1.71-.72-.63-.21-1.28-.368-1.95-.473-.67-.104-1.35-.157-2.03-.157C5.616 8.006 2.36 8.338.902 9.15c-.46.26-.857.56-1.19.904-.333.344-.584.7-.756 1.068-.17.368-.25.733-.25 1.095 0 .37.09.742.27 1.114.18.373.49.77.93 1.19.44.42 1.08.9 1.92 1.44.84.54 1.95 1.13 3.32 1.77 1.37.64 3.06 1.31 5.06 2.01 2 .7 4.38 1.34 7.14 1.92 2.76.58 5.9.87 9.42.87 1.26 0 2.49-.03 3.69-.09 1.2-.06 2.36-.18 3.47-.37 1.11-.19 2.16-.46 3.13-.82.98-.36 1.81-.83 2.51-1.41.7-.58 1.27-1.34 1.7-2.28.43-.94.66-2.14.67-3.6.02-1.46-.17-3.06-.55-4.79-.38-1.73-.99-3.62-1.84-5.68-.84-2.06-1.95-4.2-3.32-6.41-1.37-2.22-3-4.45-4.88-6.7l-.58-.69c-.22-.26-.427-.5-.62-.71-.193-.22-.37-.39-.532-.51-.162-.12-.3-.2-.414-.23-.114-.03-.205-.04-.274-.04-.07 0-.126.01-.17.03-.043.02-.073.04-.09.06l-.04.04c-.02.02-.03.04-.04.06l-.01.02c-.01.01-.01.02-.01.03 0 .01 0 .02.01.03 0 .01.01.02.01.03 0 0 0 .01-.01.02-.01.01-.02.03-.04.05l-.02.02c-.01.01-.02.03-.03.04l-.01.02-.01.01c-.01.02-.02.04-.04.06l-.01.02c-.01.01-.01.03-.02.04l-.01.01c-.01.02-.02.03-.03.05l-.01.02c-.01.01-.01.03-.02.04l-.01.01-.01.01c-.01.02-.02.03-.03.05l-.01.02c-.01.01-.01.03-.02.04l-.01.01c-.01.02-.02.03-.03.05l-.01.02-.01.01-.01.01c-.01.01-.01.03-.02.04l-.01.02-.01.01c-.01.01-.01.02-.02.04 0 0 0 .01-.01.02l-1.17 1.17c-1.17 1.17-2.31 2.3-3.42 3.41-1.11 1.1-2.16 2.14-3.16 3.13-1 .98-1.9 1.9-2.68 2.75-.79.85-1.43 1.57-1.92 2.16-.5.59-.84 1.01-1.02 1.27-.18.26-.26.39-.26.39L20.5 20.45c.09.09.19.16.29.23.11.07.22.12.33.17.12.05.24.08.37.11.13.03.27.04.41.04.14 0 .29-.01.44-.04.15-.03.31-.07.48-.14.17-.06.36-.15.56-.25.2-.1.43-.23.68-.38.25-.15.53-.34.85-.56.32-.22.67-.48 1.06-.77.39-.3.82-.64 1.3-1.03.48-.39.99-.82 1.55-1.29.56-.47 1.15-.98 1.79-1.52.63-.54 1.3-1.12 2-1.73.7-.62 1.43-1.27 2.19-1.94l1.35-1.2.5-.45.18-.16c.04-.04.07-.07.1-.1.02-.02.04-.04.05-.06l.04-.04c.01-.01.02-.02.03-.04l.02-.02.01-.02.01-.01c.01-.01.02-.02.02-.03l.01-.01c0-.01.01-.01.01-.02v-.02c0-.01 0-.01-.01-.02z"/>
-  </svg>
-);
-
-const SOCIAL_ICONS: Record<string, React.ReactNode> = {
-  github: <GitHubIcon sx={{ fontSize: 24 }} />,
-  youtube: <YouTubeIcon />,
-  bilibili: <BilibiliIcon />,
-  telegram: <TelegramIcon />,
-  email: <EmailIcon sx={{ fontSize: 24 }} />,
-};
-
-const SOCIAL_NAMES: Record<string, string> = {
-  github: "GitHub",
-  youtube: "YouTube",
-  bilibili: "Bilibili",
-  telegram: "Telegram",
-  email: "Email",
-};
+import { CONTACT_CONFIG, resolveContactColor } from "@/var/contact";
+import { CONTACT_ICON_REGISTRY } from "@/var/contact-icons";
 
 interface AboutClientProps {
   content: Record<"en" | "zh", string>;
@@ -54,27 +20,31 @@ export default function AboutClient({ content }: AboutClientProps) {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
+  // Toast
+  const [toast, setToast] = useState<{ open: boolean; message: string }>({
+    open: false,
+    message: "",
+  });
+  const showToast = useCallback((message: string) => {
+    setToast({ open: true, message });
+  }, []);
+  const handleCloseToast = useCallback(() => {
+    setToast((prev) => ({ ...prev, open: false }));
+  }, []);
+
+  // Rule-based: derive every field from config — no hardcoded maps
   const socials = Object.entries(CONTACT_CONFIG)
     .filter(([, cfg]) => cfg.enabled)
     .map(([key, cfg]) => {
-      const color = key === "email"
-        ? (isDark ? "#D44638" : "#B23121")
-        : "color" in cfg ? cfg.color : "#666";
-      const href = key === "email"
-        ? `mailto:${(cfg as typeof CONTACT_CONFIG.email).address}`
-        : "url" in cfg ? cfg.url : "";
-      const username = key === "email"
-        ? (cfg as typeof CONTACT_CONFIG.email).address
-        : "username" in cfg ? cfg.username : "";
+      // email is the only special case: mailto link, use url as display
+      const isEmail = key === "email";
+      const color = resolveContactColor(cfg.color, isDark);
+      const href = isEmail ? `mailto:${cfg.url}` : cfg.url;
+      const username = isEmail ? cfg.url : cfg.username;
+      const IconComponent = CONTACT_ICON_REGISTRY[cfg.icon];
+      const hasActions = typeof cfg.actions === "function";
 
-      return {
-        key,
-        name: SOCIAL_NAMES[key] ?? key,
-        username,
-        icon: SOCIAL_ICONS[key],
-        href,
-        color,
-      };
+      return { key, name: cfg.name, username, icon: IconComponent, href, color, hasActions, actions: cfg.actions };
     });
 
   return (
@@ -111,68 +81,103 @@ export default function AboutClient({ content }: AboutClientProps) {
           </ReadingProgressProvider>
 
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5, mt: 4 }}>
-            {socials.map((social) => (
-              <Paper
-                key={social.key}
-                component={MuiLink}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                elevation={0}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  p: 2,
-                  borderRadius: 2,
-                  textDecoration: "none",
-                  border: 1,
-                  borderColor: "divider",
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    borderColor: social.color,
-                    transform: "translateX(4px)",
-                    bgcolor: alpha(social.color, 0.08),
-                  },
-                }}
-              >
-                <Box
+            {socials.map((social) => {
+              const linkProps = social.hasActions
+                ? {}
+                : {
+                    component: MuiLink,
+                    href: social.href,
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                  };
+
+              return (
+                <Paper
+                  key={social.key}
+                  {...linkProps}
+                  onClick={
+                    social.hasActions
+                      ? () => {
+                          social.actions!(showToast);
+                        }
+                      : undefined
+                  }
+                  elevation={0}
                   sx={{
-                    width: 48,
-                    height: 48,
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
+                    gap: 2,
+                    p: 2,
                     borderRadius: 2,
-                    bgcolor: alpha(social.color, 0.12),
-                    color: social.color,
-                    flexShrink: 0,
+                    textDecoration: "none",
+                    border: 1,
+                    borderColor: "divider",
+                    cursor: social.hasActions ? "pointer" : undefined,
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      borderColor: social.color,
+                      transform: "translateX(4px)",
+                      bgcolor: alpha(social.color, 0.08),
+                    },
                   }}
                 >
-                  {social.icon}
-                </Box>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Box sx={{ fontWeight: 600, color: "text.primary", fontSize: "0.875rem" }}>
-                    {social.name}
-                  </Box>
                   <Box
                     sx={{
-                      color: "text.secondary",
-                      fontSize: "0.8rem",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
+                      width: 48,
+                      height: 48,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 2,
+                      bgcolor: alpha(social.color, 0.12),
+                      color: social.color,
+                      flexShrink: 0,
                     }}
                   >
-                    {social.username}
+                    {social.icon && <social.icon />}
                   </Box>
-                </Box>
-              </Paper>
-            ))}
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Box sx={{ fontWeight: 600, color: "text.primary", fontSize: "0.875rem" }}>
+                      {social.name}
+                    </Box>
+                    <Box
+                      sx={{
+                        color: "text.secondary",
+                        fontSize: "0.8rem",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {social.username}
+                    </Box>
+                  </Box>
+                </Paper>
+              );
+            })}
           </Box>
         </Box>
       </Box>
       <Footer />
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={3000}
+        onClose={handleCloseToast}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseToast}
+          severity="info"
+          variant="filled"
+          sx={{
+            bgcolor: "primary.main",
+            color: "primary.contrastText",
+          }}
+        >
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

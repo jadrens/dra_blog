@@ -1,7 +1,10 @@
 ---
 title: 搭建了一个 GitHub 镜像站
 description: 使用 Nginx 搭建 GitHub 镜像站，加速访问
-tags: [website, mirror]
+tags:
+  - website
+  - mirror
+date: '2026-06-16T16:37:27.438Z'
 ---
 
 尝试搭建了一个 GitHub 镜像站，带宽不大，可供一般加速访问：

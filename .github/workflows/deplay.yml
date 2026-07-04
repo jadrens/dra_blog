@@ -55,10 +55,10 @@ jobs:
         env:
           WORK_PATH: ${{ secrets.WORK_PATH }}
         run: |
-          bun = "$WORK_PATH/.bun/bin/bun"
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -s" << 'ENDSSH'
             set -e
             cd ${{ secrets.WORK_PATH }}
+            export PATH="$HOME/.bun/bin:$PATH"
             echo "git fetch origin run"
             git fetch origin run
             echo "git checkout + reset"
@@ -69,13 +69,11 @@ jobs:
             echo "deps ready"
           ENDSSH
 
-      # ── 4. rsync 上传 ──
       - name: Upload archive via rsync
         run: |
           echo "Uploading archive..."
           rsync -aP --no-i-r -e "ssh" /tmp/blog-build.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/blog-build.tar.gz
 
-      # ── 5. 云端解包 + 重启 ──
       - name: Extract Archive & Restart Service
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "bash -s" << 'ENDSSH'

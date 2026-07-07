@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: Props): Promise<any> {
   const { locale } = await params;
   const localeName = locale === "zh" ? "中文" : "English";
   return {
-    title: `${localeName} Posts - dragonren-blog`,
+    title: `${localeName} Posts - jadren-blog`,
     description: `All blog posts in ${localeName}`,
   };
 }

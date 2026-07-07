@@ -35,7 +35,7 @@ export const zh: TranslationKeys = {
     toggle: "切换主题",
   },
   home: {
-    title: "dragonren",
+    title: "jadren",
     description: "欢迎来到我的博客",
   },
   footer: {

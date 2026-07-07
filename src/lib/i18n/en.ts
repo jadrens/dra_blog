@@ -33,7 +33,7 @@ export const en = {
     toggle: "Toggle theme",
   },
   home: {
-    title: "dragonren",
+    title: "jadren",
     description: "Welcome to my blog",
   },
   footer: {

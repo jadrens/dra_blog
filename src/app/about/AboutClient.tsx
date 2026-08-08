@@ -64,7 +64,7 @@ export default function AboutClient({ content }: AboutClientProps) {
         <Box sx={{ width: "100%", maxWidth: 720 }}>
           <Box sx={{ textAlign: "center", mb: 4 }}>
             <Avatar
-              src="/avatar.png"
+              src="/avatar.svg"
               alt="jadren"
               sx={{
                 width: 100,

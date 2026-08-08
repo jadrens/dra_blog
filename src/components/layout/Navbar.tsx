@@ -188,9 +188,9 @@ export default function Navbar() {
           <Avatar
             component={Link}
             href="/"
-            src="/avatar.png"
+            src="/avatar.svg"
             alt="jadren"
-            sx={{ width: 32, height: 32, flexShrink: 0, flexGrow: 0 }}
+            sx={{ width: 36, height: 36, flexShrink: 0, flexGrow: 0 }}
           />
 
           {/* 移动端布局 */}
@@ -307,9 +307,9 @@ export default function Navbar() {
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
               <Avatar
-                src="/avatar.png"
+                src="/avatar.svg"
                 alt="jadren"
-                sx={{ width: 40, height: 40 }}
+                sx={{ width: 44, height: 44 }}
               />
               <Box>
                 <Typography variant="subtitle1" sx={{ fontWeight: 600, lineHeight: 1.2 }}>

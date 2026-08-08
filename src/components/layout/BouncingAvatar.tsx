@@ -39,7 +39,6 @@ export default function BouncingAvatar() {
       if (hasStarted.current) return;
       hasStarted.current = true;
 
-      // 保存位置后再删除
       if (avatarEl) {
         const rect = avatarEl.getBoundingClientRect();
         const size = Math.max(rect.width, rect.height);
@@ -81,12 +80,10 @@ export default function BouncingAvatar() {
     const height = canvas.height;
     const wallThickness = 100;
 
-    // Use saved position and size
     const startX = startPosRef.current?.x ?? width / 2;
     const startY = startPosRef.current?.y ?? height / 2;
     const radius = startPosRef.current?.size ?? AVATAR_SIZE;
 
-    // Create walls
     const walls = [
       Bodies.rectangle(width / 2, -wallThickness / 2, width * 2, wallThickness, { isStatic: true, restitution: 0.85 }),
       Bodies.rectangle(width / 2, height + wallThickness / 2, width * 2, wallThickness, { isStatic: true, restitution: 0.85 }),
@@ -95,7 +92,6 @@ export default function BouncingAvatar() {
     ];
     World.add(Engine.world, walls);
 
-    // Create avatar ball above the footer avatar
     const avatar = Bodies.circle(startX, startY, radius, {
       restitution: 0.7,
       friction: 0.001,
@@ -105,14 +101,12 @@ export default function BouncingAvatar() {
     avatarRef.current = avatar;
     World.add(Engine.world, avatar);
 
-    // Initial drop velocity with spin
     Body.setVelocity(avatar, { x: (Math.random() - 0.5) * 4, y: 2 });
     Body.setAngularVelocity(avatar, (Math.random() - 0.5) * 0.1);
 
     const runner = Runner.create();
     Runner.run(runner, Engine);
 
-    // Click - apply force towards mouse position (on document level)
     const handleClick = (e: MouseEvent) => {
       const dx = e.clientX - avatar.position.x;
       const dy = e.clientY - avatar.position.y;
@@ -132,13 +126,11 @@ export default function BouncingAvatar() {
 
     document.addEventListener("click", handleClick);
 
-    // Track speed for wall-bounce sparkle
     let prevVelX = avatar.velocity.x;
     let prevVelY = avatar.velocity.y;
 
-    // Load avatar image
     const avatarImg = new Image();
-    avatarImg.src = "/avatar.png";
+    avatarImg.src = "/avatar.svg";
     avatarImgRef.current = avatarImg;
 
     let frameId: number;
@@ -150,7 +142,6 @@ export default function BouncingAvatar() {
       let y = body.position.y;
       const speed = Math.sqrt(body.velocity.x ** 2 + body.velocity.y ** 2);
 
-      // Safety: clamp ball back into viewport if it escapes (tunneling / resize)
       const margin = radius;
       let clamped = false;
       let newVx = body.velocity.x;
@@ -183,13 +174,11 @@ export default function BouncingAvatar() {
       if (clamped) {
         Body.setPosition(body, { x, y });
         Body.setVelocity(body, { x: newVx, y: newVy });
-        // Wall-bounce: spawn avatar-image fragment burst
         if (speed > 3) {
           spawnFragments(x, y, speed, radius, body.angle);
         }
       }
 
-      // Wall-bounce from direction change (smooth Matter.js wall collisions)
       const velFlipX = (prevVelX > 0) !== (body.velocity.x > 0) && Math.abs(body.velocity.x) > 2;
       const velFlipY = (prevVelY > 0) !== (body.velocity.y > 0) && Math.abs(body.velocity.y) > 2;
       if ((velFlipX || velFlipY) && speed > 3 && Date.now() - lastWallBounceRef.current > 100) {
@@ -201,28 +190,22 @@ export default function BouncingAvatar() {
       prevVelX = body.velocity.x;
       prevVelY = body.velocity.y;
 
-      // Moving trail particles (colored dots)
       if (speed > 1.5 && Math.random() > 0.3) {
         spawnTrailParticle(x, y, speed, radius);
       }
 
-      // Update & draw particles
       updateAndDrawParticles(ctx);
 
-      // Hue rotation
       hueRef.current = (hueRef.current + 0.3) % 360;
 
-      // Spring-back squash animation
       const s = squashRef.current;
       s.x += (1 - s.x) * 0.15;
       s.y += (1 - s.y) * 0.15;
 
-      // Shadow + Ball + avatar image with squash/stretch
       ctx.save();
       ctx.translate(x, y);
       ctx.scale(s.x, s.y);
 
-      // Shadow (inside scale so it matches the squashed ball)
       ctx.save();
       ctx.beginPath();
       ctx.arc(3, 3, radius, 0, Math.PI * 2);
@@ -232,7 +215,6 @@ export default function BouncingAvatar() {
 
       ctx.rotate(body.angle);
 
-      // Circle background with random hue
       ctx.beginPath();
       ctx.arc(0, 0, radius, 0, Math.PI * 2);
       const hue = (hueRef.current + speed * 5) % 360;
@@ -242,7 +224,6 @@ export default function BouncingAvatar() {
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Avatar image clipped to circle
       ctx.beginPath();
       ctx.arc(0, 0, radius - 1, 0, Math.PI * 2);
       ctx.clip();
@@ -266,14 +247,10 @@ export default function BouncingAvatar() {
     };
   }, [visible]);
 
-  // —— Particle helpers ——
-
-  // Collision: avatar-image fragment burst
   function spawnFragments(x: number, y: number, speed: number, radius: number, avatarAngle: number) {
     const count = Math.floor(3 + Math.random() * 6);
     for (let i = 0; i < count; i++) {
       const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 1.2;
-      // Random source position within the avatar circle
       const srcDist = Math.random() * radius * 0.7;
       const fragRadius = radius * (0.15 + Math.random() * 0.4);
       particlesRef.current.push({
@@ -334,17 +311,14 @@ export default function BouncingAvatar() {
       ctx.rotate(p.angle);
 
       if (p.isAvatarFragment && img?.complete) {
-        // Draw avatar-image fragment clipped to circle
         const r = p.radius;
         ctx.beginPath();
         ctx.arc(0, 0, r, 0, Math.PI * 2);
         ctx.clip();
-        // Random offset in source image — each fragment shows a different piece
         const srcX = ((Math.sin(p.angle * 3.7) * 0.5 + 0.5) * r * 2);
         const srcY = ((Math.cos(p.angle * 2.3) * 0.5 + 0.5) * r * 2);
         ctx.drawImage(img, srcX, srcY, r * 3, r * 3, -r, -r, r * 2, r * 2);
       } else {
-        // Colored dot (trail)
         const size = p.radius * (1 - p.life / p.maxLife);
         ctx.beginPath();
         ctx.arc(0, 0, size, 0, Math.PI * 2);

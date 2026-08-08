@@ -17,7 +17,6 @@ function smoothNoise(x: number, y: number, z: number): number {
   const fy = y - iy;
   const fz = z - iz;
 
-  // Smoothstep
   const ux = fx * fx * (3 - 2 * fx);
   const uy = fy * fy * (3 - 2 * fy);
   const uz = fz * fz * (3 - 2 * fz);
@@ -39,7 +38,7 @@ function smoothNoise(x: number, y: number, z: number): number {
 }
 
 function noise3D(x: number, y: number, z: number): number {
-  return smoothNoise(x, y, z) * 2 - 1; // [-1, 1]
+  return smoothNoise(x, y, z) * 2 - 1;
 }
 
 const CONFETTI_SVGS: { src: string; w: number; h: number; weight: number }[] = [
@@ -147,7 +146,6 @@ export default function ConfettiBackground() {
     ];
     World.add(Engine.world, walls);
 
-    // --- Depth layering: background (0), mid (1), foreground (2) ---
     type DepthLayer = 0 | 1 | 2;
     const depthConfig: Record<DepthLayer, { scaleRange: [number, number]; frictionAir: number; opacity: number; blur: number; driftFactor: number }> = {
       0: { scaleRange: [0.2, 0.35], frictionAir: 0.05, opacity: 0.3, blur: 2, driftFactor: 0.35 },
@@ -155,9 +153,8 @@ export default function ConfettiBackground() {
       2: { scaleRange: [0.55, 0.85], frictionAir: 0.02, opacity: 1.0, blur: 0, driftFactor: 1.8 },
     };
 
-    // Nonlinear particle scaling — density feels right across screen sizes
     const area = width * height;
-    const baseArea = 390 * 844; // Reference phone resolution
+    const baseArea = 390 * 844;
     const rawCount = Math.floor(26 * Math.pow(area / baseArea, 0.5));
     const confettiCount = Math.max(24, Math.min(80, rawCount));
     for (let i = 0; i < confettiCount; i++) {
@@ -172,7 +169,6 @@ export default function ConfettiBackground() {
         }
       }
 
-      // Depth assignment: weighted random (more background, less foreground)
       const depthRoll = Math.random();
       const depth: DepthLayer = depthRoll < 0.35 ? 0 : depthRoll < 0.75 ? 1 : 2;
       const cfg = depthConfig[depth];
@@ -199,16 +195,13 @@ export default function ConfettiBackground() {
       (body as any).depth = depth;
       (body as any).depthConfig = cfg;
 
-      // Noise offset per body for variety
       (body as any).noiseOffsetX = Math.random() * 1000;
       (body as any).noiseOffsetY = Math.random() * 1000;
       (body as any).noiseOffsetZ = Math.random() * 1000;
 
-      // Sleep-like energy (0=almost still, 1=full movement)
       (body as any).energy = 0.3 + Math.random() * 0.5;
       (body as any).energyPhase = Math.random() * Math.PI * 2;
 
-      // Wobble params for soft rotation feel
       (body as any).wobbleFreq = 0.3 + Math.random() * 0.4;
       (body as any).wobblePhase = Math.random() * Math.PI * 2;
       (body as any).wobbleAmp = 0.05 + Math.random() * 0.1;
@@ -221,7 +214,6 @@ export default function ConfettiBackground() {
       time += 0.016;
       const mouse = mouseRef.current;
 
-      // Global slow drift (world breathing)
       const globalFlowX = Math.sin(time * 0.03) * 0.000005;
       const globalFlowY = Math.cos(time * 0.025) * 0.000005;
 
@@ -232,7 +224,6 @@ export default function ConfettiBackground() {
         const energy = (body as any).energy as number;
         const noiseZ = (body as any).noiseOffsetZ as number;
 
-        // Noise flow field for organic fluid movement
         const nx = (body as any).noiseOffsetX as number;
         const ny = (body as any).noiseOffsetY as number;
         const noiseVal = noise3D(
@@ -249,7 +240,6 @@ export default function ConfettiBackground() {
           y: Math.sin(angle) * forceScale + globalFlowY,
         });
 
-        // Occasional micro-impulse (like being caught in a slow current)
         if (Math.random() < 0.0008) {
           Body.applyForce(body, body.position, {
             x: (Math.random() - 0.5) * 0.00005 * energy,
@@ -257,13 +247,11 @@ export default function ConfettiBackground() {
           });
         }
 
-        // --- Swirl mouse interaction (tangential vortex, not radial push) ---
         if (mouse.active) {
           const dx = body.position.x - mouse.x;
           const dy = body.position.y - mouse.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 260 && dist > 5) {
-            // Tangential direction (perpendicular to radial)
             const tangentX = -dy / dist;
             const tangentY = dx / dist;
             const swirlForce = 0.00022 * (1 - dist / 260) * (energy * 0.5 + 0.5);
@@ -281,8 +269,6 @@ export default function ConfettiBackground() {
 
     let frameId: number;
     const render = () => {
-      // --- Cream haze: semi-transparent overlay for motion trails ---
-      // Uses transparent fill (respects dark background), no color cast
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       Composite.allBodies(Engine.world).forEach((body: Matter.Body) => {
@@ -300,12 +286,9 @@ export default function ConfettiBackground() {
         ctx.save();
         ctx.translate(body.position.x, body.position.y);
 
-        // Wobble rotation: soft, creamy翻动
         const wobble = Math.sin(time * wobbleFreq + wobblePhase) * wobbleAmp;
         ctx.rotate(body.angle + wobble);
 
-        // Depth-based blur (soft shadow for depth)
-        // In dark mode, give confetti a soft glow
         if (isDarkRef.current) {
           const glowIntensity = cfg.opacity;
           ctx.shadowBlur = 6 + cfg.blur * 3;
@@ -315,7 +298,6 @@ export default function ConfettiBackground() {
           ctx.shadowColor = "rgba(255,255,255,0.12)";
         }
 
-        // Opacity from depth config
         ctx.globalAlpha = cfg.opacity;
 
         ctx.drawImage(

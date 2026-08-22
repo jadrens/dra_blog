@@ -1,9 +1,12 @@
 ---
 title: Fixing Dolphin Application Associations After Installing Nix on Arch/Hyprland
-description: Dolphin could no longer open files with their associated applications because Nix changed the data-directory paths and invalidated the KSycoca cache.
+description: >-
+  Dolphin could no longer open files with their associated applications because
+  Nix changed the data-directory paths and invalidated the KSycoca cache.
 tags:
   - dolphin
   - issue
+date: '2026-08-22T09:41:45.147Z'
 ---
 
 # TL;DR

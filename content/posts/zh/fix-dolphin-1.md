@@ -4,6 +4,7 @@ description: 测试发现 Dolphin 无法自动关联打开应用。经过排查�
 tags:
   - dolphin
   - issue
+date: '2026-08-22T09:41:23.683Z'
 ---
 
 # TL;DR

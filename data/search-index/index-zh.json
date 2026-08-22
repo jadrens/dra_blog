@@ -1,7 +1,18 @@
 {
   "version": 1,
-  "generatedAt": "2026-06-16T16:37:27.441Z",
+  "generatedAt": "2026-08-22T09:41:23.685Z",
   "postsByDate": [
+    {
+      "slug": "fix-dolphin-1",
+      "title": "解决 Arch/Hyprland 环境下引入 Nix 导致 Dolphin 无法自动关联打开应用的问题",
+      "description": "测试发现 Dolphin 无法自动关联打开应用。经过排查，发现是 Nix 变动路径导致的缓存问题。",
+      "date": "2026-08-22T09:41:23.683Z",
+      "tags": [
+        "dolphin",
+        "issue"
+      ],
+      "locale": "zh"
+    },
     {
       "slug": "github-mirror",
       "title": "搭建了一个 GitHub 镜像站",
@@ -26,6 +37,32 @@
     }
   ],
   "postsByTag": {
+    "dolphin": [
+      {
+        "slug": "fix-dolphin-1",
+        "title": "解决 Arch/Hyprland 环境下引入 Nix 导致 Dolphin 无法自动关联打开应用的问题",
+        "description": "测试发现 Dolphin 无法自动关联打开应用。经过排查，发现是 Nix 变动路径导致的缓存问题。",
+        "date": "2026-08-22T09:41:23.683Z",
+        "tags": [
+          "dolphin",
+          "issue"
+        ],
+        "locale": "zh"
+      }
+    ],
+    "issue": [
+      {
+        "slug": "fix-dolphin-1",
+        "title": "解决 Arch/Hyprland 环境下引入 Nix 导致 Dolphin 无法自动关联打开应用的问题",
+        "description": "测试发现 Dolphin 无法自动关联打开应用。经过排查，发现是 Nix 变动路径导致的缓存问题。",
+        "date": "2026-08-22T09:41:23.683Z",
+        "tags": [
+          "dolphin",
+          "issue"
+        ],
+        "locale": "zh"
+      }
+    ],
     "website": [
       {
         "slug": "github-mirror",

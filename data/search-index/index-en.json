@@ -1,7 +1,18 @@
 {
   "version": 1,
-  "generatedAt": "2026-06-16T16:37:18.711Z",
+  "generatedAt": "2026-08-22T09:41:45.148Z",
   "postsByDate": [
+    {
+      "slug": "fix-dolphin-1",
+      "title": "Fixing Dolphin Application Associations After Installing Nix on Arch/Hyprland",
+      "description": "Dolphin could no longer open files with their associated applications because Nix changed the data-directory paths and invalidated the KSycoca cache.",
+      "date": "2026-08-22T09:41:45.147Z",
+      "tags": [
+        "dolphin",
+        "issue"
+      ],
+      "locale": "en"
+    },
     {
       "slug": "github-mirror",
       "title": "Set Up a GitHub Mirror Site",
@@ -26,6 +37,32 @@
     }
   ],
   "postsByTag": {
+    "dolphin": [
+      {
+        "slug": "fix-dolphin-1",
+        "title": "Fixing Dolphin Application Associations After Installing Nix on Arch/Hyprland",
+        "description": "Dolphin could no longer open files with their associated applications because Nix changed the data-directory paths and invalidated the KSycoca cache.",
+        "date": "2026-08-22T09:41:45.147Z",
+        "tags": [
+          "dolphin",
+          "issue"
+        ],
+        "locale": "en"
+      }
+    ],
+    "issue": [
+      {
+        "slug": "fix-dolphin-1",
+        "title": "Fixing Dolphin Application Associations After Installing Nix on Arch/Hyprland",
+        "description": "Dolphin could no longer open files with their associated applications because Nix changed the data-directory paths and invalidated the KSycoca cache.",
+        "date": "2026-08-22T09:41:45.147Z",
+        "tags": [
+          "dolphin",
+          "issue"
+        ],
+        "locale": "en"
+      }
+    ],
     "website": [
       {
         "slug": "github-mirror",

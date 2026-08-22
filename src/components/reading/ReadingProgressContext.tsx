@@ -70,12 +70,36 @@ export function slugify(text: string): string {
 }
 
 export function extractHeadings(content: string): Heading[] {
-  const headingRegex = /^(#{1,3})\s+(.+)$/gm;
   const headings: Heading[] = [];
   const parentStack = [{ level: 0, children: headings }];
+  let fence: { marker: "`" | "~"; length: number } | null = null;
 
-  let match;
-  while ((match = headingRegex.exec(content)) !== null) {
+  for (const line of content.split(/\r?\n/)) {
+    if (fence) {
+      const closingFence = line.match(/^ {0,3}(`{3,}|~{3,})[ \t]*$/);
+      if (
+        closingFence &&
+        closingFence[1][0] === fence.marker &&
+        closingFence[1].length >= fence.length
+      ) {
+        fence = null;
+      }
+      continue;
+    }
+
+    const openingFence = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    if (openingFence) {
+      const marker = openingFence[1][0] as "`" | "~";
+      // A backtick fence cannot contain backticks in its info string.
+      if (marker === "~" || !openingFence[2].includes("`")) {
+        fence = { marker, length: openingFence[1].length };
+        continue;
+      }
+    }
+
+    const match = line.match(/^(#{1,3})[ \t]+(.+)$/);
+    if (!match) continue;
+
     const level = match[1].length;
     const text = match[2].trim();
     const id = slugify(text);
@@ -89,5 +113,6 @@ export function extractHeadings(content: string): Heading[] {
     parentStack[parentStack.length - 1].children.push(heading);
     parentStack.push(heading);
   }
+
   return headings;
 }

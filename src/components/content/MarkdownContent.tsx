@@ -10,7 +10,7 @@ import { Box, Paper } from "@mui/material";
 import CodeBlock from "./CodeBlock";
 import { useEffect, useRef, useCallback } from "react";
 import TagIcon from "@mui/icons-material/Tag";
-import { useReadingProgress, slugify } from "../reading/ReadingProgressContext";
+import { extractHeadings, useReadingProgress, slugify } from "../reading/ReadingProgressContext";
 import React from "react";
 import { tocDesktopWidth } from "@/var/toc";
 
@@ -166,30 +166,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
   }, [headings]);
 
   useEffect(() => {
-    const headingRegex = /^(#{1,3})\s+(.+)$/gm;
-    const headings: { id: string; text: string; level: 1 | 2 | 3 }[] = [];
-    let match;
-    while ((match = headingRegex.exec(content)) !== null) {
-      const level = match[1].length as 1 | 2 | 3;
-      const text = match[2].trim();
-      const id = slugify(text);
-      headings.push({ id, text, level });
-    }
-
-    type HeadingNode = { id: string; text: string; level: 1 | 2 | 3; children: HeadingNode[] };
-    const result: HeadingNode[] = [];
-    const parentStack = [{ level: 0, children: result }];
-
-    headings.forEach((h) => {
-      const node: HeadingNode = { ...h, children: [] };
-      while (parentStack.length > 1 && parentStack[parentStack.length - 1].level >= h.level) {
-        parentStack.pop();
-      }
-      parentStack[parentStack.length - 1].children.push(node);
-      parentStack.push(node);
-    });
-
-    setHeadings(result);
+    setHeadings(extractHeadings(content));
   }, [content, setHeadings]);
 
   return (

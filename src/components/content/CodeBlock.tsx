@@ -20,6 +20,7 @@ mdiLanguageCss3,
 mdiCodeJson,
  } from "@mdi/js"
 import {Icon} from "@mdi/react"
+import ShellHighlighter from "./ShellHighlighter";
 
 interface CodeBlockProps {
   children: React.ReactNode;
@@ -36,6 +37,9 @@ const languageColorsLight: Record<string, string> = {
   bash: "#2e8c1c",
   sh: "#2e8c1c",
   shell: "#2e8c1c",
+  zsh: "#2e8c1c",
+  console: "#2e8c1c",
+  terminal: "#2e8c1c",
   html: "#c23d1e",
   css: "#3d2666",
   json: "#444444",
@@ -57,6 +61,9 @@ const languageColorsDark: Record<string, string> = {
   bash: "#4EAA25",
   sh: "#4EAA25",
   shell: "#4EAA25",
+  zsh: "#4EAA25",
+  console: "#4EAA25",
+  terminal: "#4EAA25",
   html: "#e34c26",
   css: "#563d7c",
   json: "#bbbbbb",
@@ -79,6 +86,9 @@ const languageIcons: Record<string, string> = {
   bash: mdiBash,
   sh: mdiBash,
   shell: mdiBash,
+  zsh: mdiBash,
+  console: mdiBash,
+  terminal: mdiBash,
   html: mdiLanguageHtml5,
   css: mdiLanguageCss3,
   json: mdiCodeJson,
@@ -94,7 +104,7 @@ export default function CodeBlock({ children, className }: CodeBlockProps) {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const { t } = useI18n();
-  const language = className?.split(" ").at(-1)?.replace("language-", "") || "";
+  const language = className?.match(/(?:^|\s)language-([\w-]+)/)?.[1] || "";
   const iconColor = (isDark ? languageColorsDark[language] : languageColorsLight[language]) || (isDark ? "#808080" : "#6d6d6d");
   const isNginx = language === "nginx" || language === "conf";
   const LanguageIcon = isNginx ? (
@@ -117,18 +127,25 @@ export default function CodeBlock({ children, className }: CodeBlockProps) {
   const codeText = useMemo(() => extractText(children), [children]);
 
   const highlightedChildren = useMemo(() => {
-    if (language !== "nginx" && language !== "conf") return children;
+    const isShell = ["bash", "sh", "shell", "zsh", "console", "terminal"].includes(language);
+    if (!isShell && language !== "nginx" && language !== "conf") return children;
 
-    const tokens = tokenizeNginx(codeText);
     return React.Children.map(children, (child) => {
-      if (React.isValidElement(child) && child.type === "code") {
+      if (React.isValidElement<{ children?: React.ReactNode }>(child) && child.type === "code") {
+        if (isShell) {
+          return React.cloneElement(child, {
+            children: <ShellHighlighter code={codeText} isDark={isDark} />,
+          });
+        }
+
+        const tokens = tokenizeNginx(codeText);
         return React.cloneElement(child, {
           children: tokens.map((token, i) => (
             <span key={i} style={{ color: getNginxTokenColor(token.type, isDark) }}>
               {token.text}
             </span>
           )),
-        } as any);
+        });
       }
       return child;
     });

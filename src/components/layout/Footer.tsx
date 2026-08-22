@@ -54,18 +54,16 @@ export default function Footer() {
               sx={{ p: 1.5 }}
             />
           )}
-          {/* <Chip
+          <Chip
             icon={<LinkIcon sx={{ fontSize: 14 }} />}
-            label={t.footer.beian}
+            label="Back to Nav"
             component="a"
-            href="https://beian.miit.gov.cn/"
+            href="https://jadren.me"
             clickable
             size="small"
             variant="outlined"
-            target="_blank"
-            rel="noopener"
             sx={{ p: 1.5 }}
-          /> */}
+          />
           {SITE_CONFIG.githubClipEnabled && (
             <Chip
               icon={<GitHubIcon sx={{ fontSize: 14 }} />}
